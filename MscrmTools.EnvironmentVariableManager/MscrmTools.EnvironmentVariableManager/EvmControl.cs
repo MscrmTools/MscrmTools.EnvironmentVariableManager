@@ -60,7 +60,7 @@ namespace MscrmTools.EnvironmentVariableManager
                         LinkFromAttributeName = "environmentvariabledefinitionid",
                         LinkToAttributeName = "environmentvariabledefinitionid",
                         LinkToEntityName = "environmentvariabledefinition",
-                        Columns = new ColumnSet("displayname", "schemaname"),
+                        Columns = new ColumnSet("displayname", "schemaname", "type"),
                         EntityAlias = "def",
                         Orders = { new OrderExpression("displayname", OrderType.Ascending) }
                     }
@@ -72,6 +72,8 @@ namespace MscrmTools.EnvironmentVariableManager
             table.Columns.Add(new DataColumn("Schema name") { ReadOnly = true });
             table.Columns.Add(new DataColumn("Value"));
             table.Columns.Add(new DataColumn("Id") { ReadOnly = true });
+            table.Columns.Add(new DataColumn("Type") { ReadOnly = true });
+            table.Columns.Add(new DataColumn("TypeInt") { ReadOnly = true });
 
             foreach (var variable in variables.Entities)
             {
@@ -79,17 +81,47 @@ namespace MscrmTools.EnvironmentVariableManager
                     variable.GetAttributeValue<AliasedValue>("def.displayname").Value.ToString(),
                     variable.GetAttributeValue<AliasedValue>("def.schemaname").Value.ToString(),
                     variable.GetAttributeValue<string>("value"),
-                    variable.Id
+                    variable.Id,
+                    variable.FormattedValues["def.type"],
+                    ((OptionSetValue)variable.GetAttributeValue<AliasedValue>("def.type").Value).Value
                 );
             }
 
             dataGridView1.DataSource = table;
+
             SetDatagridViewColumnsSettings();
             dataGridView1.CellValueChanged += DataGridView1_CellValueChanged;
         }
 
         private void DataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
+            var changedCell = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex];
+            var type = int.Parse(dataGridView1.Rows[e.RowIndex].Cells[5].Value.ToString());
+            if (type == 100000001)
+            {
+                if (!decimal.TryParse(changedCell.Value.ToString(), out decimal _))
+                {
+                    MessageBox.Show(this,
+                        @"Provided value does not fit with data type Decimal.
+
+Please correct the value", @"Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+            else if (type == 100000002)
+            {
+                if (!Boolean.TryParse(changedCell.Value.ToString(), out bool _))
+                {
+                    MessageBox.Show(this,
+                        @"Provided value does not fit with data type Boolean.
+
+Please correct the value: true or false", @"Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
             _rowsIndexChanged.Add(e.RowIndex);
 
             foreach (DataGridViewCell cell in dataGridView1.Rows[e.RowIndex].Cells)
@@ -193,6 +225,8 @@ namespace MscrmTools.EnvironmentVariableManager
             dataGridView1.Columns[1].Width = 200;
             dataGridView1.Columns[2].Width = 600;
             dataGridView1.Columns[3].Visible = false;
+            dataGridView1.Columns[4].Width = 100;
+            dataGridView1.Columns[5].Visible = false;
         }
 
         #region Github
