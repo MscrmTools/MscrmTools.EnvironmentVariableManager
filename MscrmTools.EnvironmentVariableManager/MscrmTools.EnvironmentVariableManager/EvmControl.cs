@@ -21,10 +21,6 @@ namespace MscrmTools.EnvironmentVariableManager
             InitializeComponent();
         }
 
-        private void MyPluginControl_Load(object sender, EventArgs e)
-        {
-        }
-
         /// <summary>
         /// This event occurs when the connection has been updated in XrmToolBox
         /// </summary>
@@ -38,65 +34,12 @@ namespace MscrmTools.EnvironmentVariableManager
             }
         }
 
-        private void toolStripMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-            if (e.ClickedItem == tsbLoad)
-            {
-                ExecuteMethod(LoadVariables);
-            }
-        }
-
-        private void LoadVariables()
-        {
-            var variables = Service.RetrieveMultiple(new QueryExpression("environmentvariablevalue")
-            {
-                NoLock = true,
-                ColumnSet = new ColumnSet("value"),
-                LinkEntities =
-                {
-                    new LinkEntity
-                    {
-                        LinkFromEntityName = "environmentvariablevalue",
-                        LinkFromAttributeName = "environmentvariabledefinitionid",
-                        LinkToAttributeName = "environmentvariabledefinitionid",
-                        LinkToEntityName = "environmentvariabledefinition",
-                        Columns = new ColumnSet("displayname", "schemaname", "type"),
-                        EntityAlias = "def",
-                        Orders = { new OrderExpression("displayname", OrderType.Ascending) }
-                    }
-                }
-            });
-
-            var table = new DataTable();
-            table.Columns.Add(new DataColumn("Variable name") { ReadOnly = true });
-            table.Columns.Add(new DataColumn("Schema name") { ReadOnly = true });
-            table.Columns.Add(new DataColumn("Value"));
-            table.Columns.Add(new DataColumn("Id") { ReadOnly = true });
-            table.Columns.Add(new DataColumn("Type") { ReadOnly = true });
-            table.Columns.Add(new DataColumn("TypeInt") { ReadOnly = true });
-
-            foreach (var variable in variables.Entities)
-            {
-                table.Rows.Add(
-                    variable.GetAttributeValue<AliasedValue>("def.displayname").Value.ToString(),
-                    variable.GetAttributeValue<AliasedValue>("def.schemaname").Value.ToString(),
-                    variable.GetAttributeValue<string>("value"),
-                    variable.Id,
-                    variable.FormattedValues["def.type"],
-                    ((OptionSetValue)variable.GetAttributeValue<AliasedValue>("def.type").Value).Value
-                );
-            }
-
-            dataGridView1.DataSource = table;
-
-            SetDatagridViewColumnsSettings();
-            dataGridView1.CellValueChanged += DataGridView1_CellValueChanged;
-        }
-
         private void DataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
+            if (e.ColumnIndex != 2) return;
+
             var changedCell = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex];
-            var type = int.Parse(dataGridView1.Rows[e.RowIndex].Cells[5].Value.ToString());
+            var type = int.Parse(dataGridView1.Rows[e.RowIndex].Cells[6].Value.ToString());
             if (type == 100000001)
             {
                 if (!decimal.TryParse(changedCell.Value.ToString(), out decimal _))
@@ -130,6 +73,105 @@ Please correct the value: true or false", @"Error",
             }
         }
 
+        private void LoadVariables()
+        {
+            //var variables = Service.RetrieveMultiple(new QueryExpression("environmentvariablevalue")
+            //{
+            //    NoLock = true,
+            //    ColumnSet = new ColumnSet("value"),
+            //    LinkEntities =
+            //    {
+            //        new LinkEntity
+            //        {
+            //            JoinOperator = JoinOperator.LeftOuter,
+            //            LinkFromEntityName = "environmentvariablevalue",
+            //            LinkFromAttributeName = "environmentvariabledefinitionid",
+            //            LinkToAttributeName = "environmentvariabledefinitionid",
+            //            LinkToEntityName = "environmentvariabledefinition",
+            //            Columns = new ColumnSet("displayname", "schemaname", "type"),
+            //            EntityAlias = "def",
+            //            Orders = { new OrderExpression("displayname", OrderType.Ascending) }
+            //        }
+            //    }
+            //});
+
+            var variables = Service.RetrieveMultiple(new QueryExpression("environmentvariabledefinition")
+            {
+                NoLock = true,
+                ColumnSet = new ColumnSet("displayname", "schemaname", "type"),
+                LinkEntities =
+                {
+                    new LinkEntity
+                    {
+                        JoinOperator = JoinOperator.LeftOuter,
+                        LinkFromEntityName = "environmentvariabledefinition",
+                        LinkFromAttributeName = "environmentvariabledefinitionid",
+                        LinkToAttributeName = "environmentvariabledefinitionid",
+                        LinkToEntityName = "environmentvariablevalue",
+                        Columns = new ColumnSet("value","environmentvariablevalueid"),
+                        EntityAlias = "val",
+                    }
+                },
+                Orders = { new OrderExpression("displayname", OrderType.Ascending) }
+            });
+
+            var table = new DataTable();
+            table.Columns.Add(new DataColumn("Variable name") { ReadOnly = true });
+            table.Columns.Add(new DataColumn("Schema name") { ReadOnly = true });
+            table.Columns.Add(new DataColumn("Value"));
+            table.Columns.Add(new DataColumn("ValueId"));
+            table.Columns.Add(new DataColumn("DefId") { ReadOnly = true });
+            table.Columns.Add(new DataColumn("Type") { ReadOnly = true });
+            table.Columns.Add(new DataColumn("TypeInt") { ReadOnly = true });
+
+            foreach (var variable in variables.Entities)
+            {
+                Guid id = Guid.Empty;
+                if (variable.GetAttributeValue<AliasedValue>("val.environmentvariablevalueid") != null)
+                {
+                    id = (Guid)variable.GetAttributeValue<AliasedValue>("val.environmentvariablevalueid").Value;
+                }
+
+                table.Rows.Add(
+                    variable.GetAttributeValue<string>("displayname"),
+                    variable.GetAttributeValue<string>("schemaname"),
+                    variable.GetAttributeValue<AliasedValue>("val.value")?.Value?.ToString() ?? "",
+                    id.ToString(),
+                    variable.Id,
+                    variable.FormattedValues["type"],
+                    variable.GetAttributeValue<OptionSetValue>("type").Value
+                );
+            }
+
+            dataGridView1.DataSource = table;
+
+            SetDatagridViewColumnsSettings();
+            dataGridView1.CellValueChanged += DataGridView1_CellValueChanged;
+        }
+
+        private void MyPluginControl_Load(object sender, EventArgs e)
+        {
+        }
+
+        private void SetDatagridViewColumnsSettings()
+        {
+            dataGridView1.Columns[0].Width = 200;
+            dataGridView1.Columns[1].Width = 200;
+            dataGridView1.Columns[2].Width = 600;
+            dataGridView1.Columns[3].Visible = false;
+            dataGridView1.Columns[4].Visible = false;
+            dataGridView1.Columns[5].Width = 100;
+            dataGridView1.Columns[6].Visible = false;
+        }
+
+        private void toolStripMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            if (e.ClickedItem == tsbLoad)
+            {
+                ExecuteMethod(LoadVariables);
+            }
+        }
+
         private void tsbUpdate_Click(object sender, EventArgs e)
         {
             if (_rowsIndexChanged.Count == 0)
@@ -143,16 +185,17 @@ Please correct the value: true or false", @"Error",
                 MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
                 return;
 
-            var list = new List<Tuple<Guid, string, string, int>>();
+            var list = new List<Tuple<Guid, Guid, string, string, int>>();
 
             foreach (var index in _rowsIndexChanged)
             {
                 var row = dataGridView1.Rows[index];
                 var variable = row.Cells[0].Value.ToString();
-                var id = new Guid(row.Cells[3].Value.ToString());
+                var id = new Guid(row.Cells[3].Value?.ToString() ?? Guid.Empty.ToString());
+                var defId = new Guid(row.Cells[4].Value?.ToString() ?? Guid.Empty.ToString());
                 var value = row.Cells[2].Value.ToString();
 
-                list.Add(new Tuple<Guid, string, string, int>(id, variable, value, index));
+                list.Add(new Tuple<Guid, Guid, string, string, int>(id, defId, variable, value, index));
             }
 
             WorkAsync(new WorkAsyncInfo
@@ -163,24 +206,43 @@ Please correct the value: true or false", @"Error",
 
                     foreach (var item in list)
                     {
-                        bw.ReportProgress(0, $"Updating variable '{item.Item2}'");
-
+                        bw.ReportProgress(0, $"Updating variable '{item.Item3}'");
+                        Guid id = Guid.Empty;
                         try
                         {
-                            Service.Update(new Entity("environmentvariablevalue")
+                            if (item.Item1 == Guid.Empty)
                             {
-                                Id = item.Item1,
-                                Attributes =
+                                id = Service.Create(new Entity("environmentvariablevalue")
                                 {
-                                    {"value", item.Item3}
-                                }
-                            });
+                                    Attributes =
+                                    {
+                                        {"environmentvariabledefinitionid", new EntityReference("environmentvariabledefinition", item.Item2)},
+                                        {"value", item.Item3 }
+                                    }
+                                });
+                            }
+                            else
+                            {
+                                Service.Update(new Entity("environmentvariablevalue")
+                                {
+                                    Id = item.Item1,
+                                    Attributes =
+                                    {
+                                        {"value", item.Item3}
+                                    }
+                                });
+                            }
 
-                            _rowsIndexChanged.Remove(item.Item4);
+                            _rowsIndexChanged.Remove(item.Item5);
 
                             Invoke(new Action(() =>
                             {
-                                foreach (DataGridViewCell cell in dataGridView1.Rows[item.Item4].Cells)
+                                if (id != Guid.Empty)
+                                {
+                                    dataGridView1.Rows[item.Item5].Cells[3].Value = id.ToString();
+                                }
+
+                                foreach (DataGridViewCell cell in dataGridView1.Rows[item.Item5].Cells)
                                 {
                                     cell.Style.BackColor = Color.Green;
                                 }
@@ -188,7 +250,7 @@ Please correct the value: true or false", @"Error",
                         }
                         catch (Exception error)
                         {
-                            errors.Add(item.Item2, error.Message);
+                            errors.Add(item.Item3, error.Message);
                         }
                     }
 
@@ -217,16 +279,6 @@ Please correct the value: true or false", @"Error",
                     SetWorkingMessage(evt.UserState.ToString());
                 }
             });
-        }
-
-        private void SetDatagridViewColumnsSettings()
-        {
-            dataGridView1.Columns[0].Width = 200;
-            dataGridView1.Columns[1].Width = 200;
-            dataGridView1.Columns[2].Width = 600;
-            dataGridView1.Columns[3].Visible = false;
-            dataGridView1.Columns[4].Width = 100;
-            dataGridView1.Columns[5].Visible = false;
         }
 
         #region Github
