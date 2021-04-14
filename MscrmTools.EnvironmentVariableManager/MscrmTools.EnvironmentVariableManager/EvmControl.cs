@@ -217,7 +217,7 @@ Please correct the value: true or false", @"Error",
                                     Attributes =
                                     {
                                         {"environmentvariabledefinitionid", new EntityReference("environmentvariabledefinition", item.Item2)},
-                                        {"value", item.Item3 }
+                                        {"value", item.Item4 }
                                     }
                                 });
                             }
@@ -228,7 +228,7 @@ Please correct the value: true or false", @"Error",
                                     Id = item.Item1,
                                     Attributes =
                                     {
-                                        {"value", item.Item3}
+                                        {"value", item.Item4 }
                                     }
                                 });
                             }
@@ -250,7 +250,7 @@ Please correct the value: true or false", @"Error",
                         }
                         catch (Exception error)
                         {
-                            errors.Add(item.Item3, error.Message);
+                            errors.Add(item.Item4, error.Message);
                         }
                     }
 
