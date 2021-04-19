@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>MscrmTools.EnvironmentVariableManager</id>
+    <version>1.2021.4.4</version>
+    <title>Environment Variables Manager for XrmToolBox</title>
+    <authors>MscrmTools</authors>
+    <owners>MscrmTools</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectUrl>https://github.com/MscrmTools/MscrmTools.EnvironmentVariableManager</projectUrl>
+    <iconUrl>https://raw.githubusercontent.com/wiki/MscrmTools/XrmToolBox/Images/logo_0100.png</iconUrl>
+    <description>This tool helps you to manage your environment variables easily</description>
+    <summary>This tool helps you to manage your environment variables easily</summary>
+    <releaseNotes>Added possibility to create and delete environment variables</releaseNotes>
+    <tags>XrmToolBox Plugin Tool Environment variable</tags>
+    <dependencies>
+      <dependency id="XrmToolBox" version="1.2020.1.1" />
+    </dependencies>
+  </metadata>
+</package>

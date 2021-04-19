@@ -1,6 +1,8 @@
 ﻿using McTools.Xrm.Connection;
+using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
+using MscrmTools.EnvironmentVariableManager.Forms;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -34,9 +36,106 @@ namespace MscrmTools.EnvironmentVariableManager
             }
         }
 
+        private void btnValidateEnv_Click(object sender, EventArgs e)
+        {
+            var def = new Entity("environmentvariabledefinition")
+            {
+                Attributes =
+                {
+                    {"schemaname",txtUniqueName.Text},
+                    {"displayname", txtDisplayName.Text},
+                    {"description", txtDescription.Text},
+                    {"defaultvalue", txtDefaultValue.Text},
+                }
+            };
+
+            switch (cbbType.SelectedItem?.ToString())
+            {
+                case "String":
+                    def["type"] = new OptionSetValue(100000000);
+                    break;
+
+                case "Number":
+                    def["type"] = new OptionSetValue(100000001);
+                    break;
+
+                case "Boolean":
+                    def["type"] = new OptionSetValue(100000002);
+                    break;
+
+                case "JSON":
+                    def["type"] = new OptionSetValue(100000003);
+                    break;
+
+                case "Connection reference":
+                    def["type"] = new OptionSetValue(100000004);
+                    break;
+
+                default:
+                    MessageBox.Show(this, @"Please select a type for the environment variable", @"Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+            }
+
+            WorkAsync(new WorkAsyncInfo
+            {
+                Message = $"Creating environment variable {def.GetAttributeValue<string>("schema name")}",
+                Work = (bw, evt) =>
+                {
+                    def.Id = Service.Create(def);
+                },
+                PostWorkCallBack = evt =>
+                {
+                    if (evt.Error != null)
+                    {
+                        MessageBox.Show(this, $@"An error occured when creating the environment variable: {evt.Error.Message}", @"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    if (MessageBox.Show(this, $@"Do you want to add variable {def.GetAttributeValue<string>("schema name")} in a solution?", @"Question",
+                       MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                    {
+                        scMain.Panel2Collapsed = true;
+                        LoadVariables();
+                        return;
+                    }
+
+                    var dialog = new SolutionPicker(Service);
+                    if (dialog.ShowDialog(this) == DialogResult.OK)
+                    {
+                        WorkAsync(new WorkAsyncInfo
+                        {
+                            Message = $"Adding environment variable {def.GetAttributeValue<string>("schema name")} to solution {dialog.SelectedSolution.GetAttributeValue<string>("friendlyname")}",
+                            Work = (bw, evt2) =>
+                            {
+                                Service.Execute(new AddSolutionComponentRequest
+                                {
+                                    ComponentId = def.Id,
+                                    ComponentType = 380,
+                                    SolutionUniqueName = dialog.SelectedSolution.GetAttributeValue<string>("uniquename")
+                                });
+
+                                def.Id = Service.Create(def);
+                            },
+                            PostWorkCallBack = evt2 =>
+                            {
+                                if (evt.Error != null)
+                                {
+                                    MessageBox.Show(this, $@"An error occured when adding environment variable to the solution: {evt.Error.Message}", @"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+
+                                scMain.Panel2Collapsed = true;
+                                LoadVariables();
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
         private void DataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.ColumnIndex != 2) return;
+            if (e.ColumnIndex != 2 || _rowsIndexChanged.Contains(e.RowIndex)) return;
 
             var changedCell = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex];
             var type = int.Parse(dataGridView1.Rows[e.RowIndex].Cells[6].Value.ToString());
@@ -54,7 +153,7 @@ Please correct the value", @"Error",
             }
             else if (type == 100000002)
             {
-                if (!Boolean.TryParse(changedCell.Value.ToString(), out bool _))
+                if (!bool.TryParse(changedCell.Value.ToString(), out bool _))
                 {
                     MessageBox.Show(this,
                         @"Provided value does not fit with data type Boolean.
@@ -75,26 +174,6 @@ Please correct the value: true or false", @"Error",
 
         private void LoadVariables()
         {
-            //var variables = Service.RetrieveMultiple(new QueryExpression("environmentvariablevalue")
-            //{
-            //    NoLock = true,
-            //    ColumnSet = new ColumnSet("value"),
-            //    LinkEntities =
-            //    {
-            //        new LinkEntity
-            //        {
-            //            JoinOperator = JoinOperator.LeftOuter,
-            //            LinkFromEntityName = "environmentvariablevalue",
-            //            LinkFromAttributeName = "environmentvariabledefinitionid",
-            //            LinkToAttributeName = "environmentvariabledefinitionid",
-            //            LinkToEntityName = "environmentvariabledefinition",
-            //            Columns = new ColumnSet("displayname", "schemaname", "type"),
-            //            EntityAlias = "def",
-            //            Orders = { new OrderExpression("displayname", OrderType.Ascending) }
-            //        }
-            //    }
-            //});
-
             var variables = Service.RetrieveMultiple(new QueryExpression("environmentvariabledefinition")
             {
                 NoLock = true,
@@ -149,10 +228,6 @@ Please correct the value: true or false", @"Error",
             dataGridView1.CellValueChanged += DataGridView1_CellValueChanged;
         }
 
-        private void MyPluginControl_Load(object sender, EventArgs e)
-        {
-        }
-
         private void SetDatagridViewColumnsSettings()
         {
             dataGridView1.Columns[0].Width = 200;
@@ -170,6 +245,54 @@ Please correct the value: true or false", @"Error",
             {
                 ExecuteMethod(LoadVariables);
             }
+        }
+
+        private void tsbCreateNewVarEnvDef_Click(object sender, EventArgs e)
+        {
+            txtDisplayName.Text = "";
+            txtUniqueName.Text = "";
+            txtDescription.Text = "";
+            txtDefaultValue.Text = "";
+            cbbType.SelectedIndex = -1;
+
+            scMain.Panel2Collapsed = false;
+        }
+
+        private void tsbDelete_Click(object sender, EventArgs e)
+        {
+            var selectedRow = dataGridView1.SelectedRows[0];
+
+            var defId = new Guid(selectedRow.Cells[4].Value?.ToString() ?? Guid.Empty.ToString());
+            if (defId == Guid.Empty)
+            {
+                MessageBox.Show(this, @"Unable to find environment variable definition ID", @"Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var variable = selectedRow.Cells[0].Value.ToString();
+
+            if (MessageBox.Show(this, $@"Are you sure you want to delete variable {variable}?", @"Question",
+               MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
+                return;
+
+            WorkAsync(new WorkAsyncInfo
+            {
+                Message = $"Deleting environment variable {variable}...",
+                Work = (bw, evt) =>
+                {
+                    Service.Delete("environmentvariabledefinition", defId);
+                },
+                PostWorkCallBack = evt =>
+                {
+                    if (evt.Error != null)
+                    {
+                        MessageBox.Show(this, $@"An error occured when deleting the environment variable: {evt.Error.Message}", @"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    LoadVariables();
+                }
+            });
         }
 
         private void tsbUpdate_Click(object sender, EventArgs e)
