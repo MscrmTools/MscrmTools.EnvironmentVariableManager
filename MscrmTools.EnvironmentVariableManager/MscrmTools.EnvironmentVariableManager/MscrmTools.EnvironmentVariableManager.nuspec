@@ -11,13 +11,13 @@
     <iconUrl>https://raw.githubusercontent.com/wiki/MscrmTools/XrmToolBox/Images/logo_0100.png</iconUrl>
     <description>This tool helps you to manage your environment variables easily</description>
     <summary>This tool helps you to manage your environment variables easily</summary>
-    <releaseNotes>Added possibility to create and delete environment variables</releaseNotes>
+    <releaseNotes>Added advanced support for JSON and Secret type of variable</releaseNotes>
     <tags>XrmToolBox Plugin Tool Environment variable</tags>
     <dependencies>
       <dependency id="XrmToolBox" version="1.2020.1.1" />
-    </dependencies>    
+    </dependencies>
   </metadata>
-   <files>
-        <file src="bin\Release\MscrmTools.EnvironmentVariableManager.dll" target="lib\net452\Plugins" />
-    </files>
+  <files>
+    <file src="bin\Release\MscrmTools.EnvironmentVariableManager.dll" target="lib\net452\Plugins" />
+  </files>
 </package>

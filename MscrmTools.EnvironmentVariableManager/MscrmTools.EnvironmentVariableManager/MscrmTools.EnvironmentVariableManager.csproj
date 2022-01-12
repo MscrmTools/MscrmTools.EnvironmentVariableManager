@@ -141,6 +141,18 @@
     <Compile Include="EvmControl.designer.cs">
       <DependentUpon>EvmControl.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\JsonForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\JsonForm.Designer.cs">
+      <DependentUpon>JsonForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\SecretForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\SecretForm.Designer.cs">
+      <DependentUpon>SecretForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\SolutionPicker.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -162,6 +174,12 @@
   <ItemGroup>
     <EmbeddedResource Include="EvmControl.resx">
       <DependentUpon>EvmControl.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\JsonForm.resx">
+      <DependentUpon>JsonForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\SecretForm.resx">
+      <DependentUpon>SecretForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\SolutionPicker.resx">
       <DependentUpon>SolutionPicker.cs</DependentUpon>
