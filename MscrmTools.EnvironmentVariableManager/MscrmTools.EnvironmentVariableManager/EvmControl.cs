@@ -250,8 +250,8 @@ Please correct the value: true or false", @"Error",
                     }
                 }).Entities.First();
 
-                txtDisplayName.Text = variable.GetAttributeValue<AliasedValue>("def.displayname").Value.ToString();
-                txtUniqueName.Text = variable.GetAttributeValue<AliasedValue>("def.schemaname").Value.ToString();
+                txtDisplayName.Text = variable.GetAttributeValue<AliasedValue>("def.displayname")?.Value.ToString();
+                txtUniqueName.Text = variable.GetAttributeValue<AliasedValue>("def.schemaname")?.Value.ToString();
                 txtDescription.Text = variable.GetAttributeValue<AliasedValue>("def.description")?.Value.ToString();
                 txtDefaultValue.Text = variable.GetAttributeValue<AliasedValue>("def.defaultvalue")?.Value.ToString();
                 cbbType.SelectedItem = variable.FormattedValues["def.type"];

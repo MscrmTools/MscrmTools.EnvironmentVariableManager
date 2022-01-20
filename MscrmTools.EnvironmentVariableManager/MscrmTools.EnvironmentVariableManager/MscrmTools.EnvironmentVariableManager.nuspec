@@ -11,7 +11,7 @@
     <iconUrl>https://raw.githubusercontent.com/wiki/MscrmTools/XrmToolBox/Images/logo_0100.png</iconUrl>
     <description>This tool helps you to manage your environment variables easily</description>
     <summary>This tool helps you to manage your environment variables easily</summary>
-    <releaseNotes>Added advanced support for JSON and Secret type of variable</releaseNotes>
+    <releaseNotes>Fixed error when an environment variable does not have a display name</releaseNotes>
     <tags>XrmToolBox Plugin Tool Environment variable</tags>
     <dependencies>
       <dependency id="XrmToolBox" version="1.2020.1.1" />
