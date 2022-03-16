@@ -32,6 +32,9 @@ namespace MscrmTools.EnvironmentVariableManager
             this.toolStripMenu = new System.Windows.Forms.ToolStrip();
             this.tsbLoad = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsbUpdate = new System.Windows.Forms.ToolStripButton();
+            this.tsbCreateNewVarEnvDef = new System.Windows.Forms.ToolStripButton();
+            this.tsbDelete = new System.Windows.Forms.ToolStripButton();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.gbEnvVariable = new System.Windows.Forms.GroupBox();
             this.btnValidateEnv = new System.Windows.Forms.Button();
@@ -46,9 +49,9 @@ namespace MscrmTools.EnvironmentVariableManager
             this.txtDisplayName = new System.Windows.Forms.TextBox();
             this.lblDisplayName = new System.Windows.Forms.Label();
             this.scMain = new System.Windows.Forms.SplitContainer();
-            this.tsbUpdate = new System.Windows.Forms.ToolStripButton();
-            this.tsbCreateNewVarEnvDef = new System.Windows.Forms.ToolStripButton();
-            this.tsbDelete = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.tslSearch = new System.Windows.Forms.ToolStripLabel();
+            this.tstxtSearch = new System.Windows.Forms.ToolStripTextBox();
             this.toolStripMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.gbEnvVariable.SuspendLayout();
@@ -63,6 +66,9 @@ namespace MscrmTools.EnvironmentVariableManager
             this.toolStripMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsbLoad,
             this.toolStripSeparator1,
+            this.tslSearch,
+            this.tstxtSearch,
+            this.toolStripSeparator2,
             this.tsbUpdate,
             this.tsbCreateNewVarEnvDef,
             this.tsbDelete});
@@ -84,6 +90,34 @@ namespace MscrmTools.EnvironmentVariableManager
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
             this.toolStripSeparator1.Size = new System.Drawing.Size(6, 46);
+            // 
+            // tsbUpdate
+            // 
+            this.tsbUpdate.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.Save_16;
+            this.tsbUpdate.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbUpdate.Name = "tsbUpdate";
+            this.tsbUpdate.Size = new System.Drawing.Size(98, 41);
+            this.tsbUpdate.Text = "Update";
+            this.tsbUpdate.Click += new System.EventHandler(this.tsbUpdate_Click);
+            // 
+            // tsbCreateNewVarEnvDef
+            // 
+            this.tsbCreateNewVarEnvDef.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.add_hover_16_new;
+            this.tsbCreateNewVarEnvDef.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbCreateNewVarEnvDef.Name = "tsbCreateNewVarEnvDef";
+            this.tsbCreateNewVarEnvDef.Size = new System.Drawing.Size(246, 41);
+            this.tsbCreateNewVarEnvDef.Text = "New Environment variable";
+            this.tsbCreateNewVarEnvDef.Click += new System.EventHandler(this.tsbCreateNewVarEnvDef_Click);
+            // 
+            // tsbDelete
+            // 
+            this.tsbDelete.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.Delete16;
+            this.tsbDelete.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbDelete.Name = "tsbDelete";
+            this.tsbDelete.Size = new System.Drawing.Size(90, 41);
+            this.tsbDelete.Text = "Delete";
+            this.tsbDelete.ToolTipText = "Delete";
+            this.tsbDelete.Click += new System.EventHandler(this.tsbDelete_Click);
             // 
             // dataGridView1
             // 
@@ -251,33 +285,25 @@ namespace MscrmTools.EnvironmentVariableManager
             this.scMain.SplitterDistance = 888;
             this.scMain.TabIndex = 7;
             // 
-            // tsbUpdate
+            // toolStripSeparator2
             // 
-            this.tsbUpdate.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.Save_16;
-            this.tsbUpdate.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsbUpdate.Name = "tsbUpdate";
-            this.tsbUpdate.Size = new System.Drawing.Size(98, 41);
-            this.tsbUpdate.Text = "Update";
-            this.tsbUpdate.Click += new System.EventHandler(this.tsbUpdate_Click);
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 46);
             // 
-            // tsbCreateNewVarEnvDef
+            // tslSearch
             // 
-            this.tsbCreateNewVarEnvDef.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.add_hover_16_new;
-            this.tsbCreateNewVarEnvDef.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsbCreateNewVarEnvDef.Name = "tsbCreateNewVarEnvDef";
-            this.tsbCreateNewVarEnvDef.Size = new System.Drawing.Size(246, 41);
-            this.tsbCreateNewVarEnvDef.Text = "New Environment variable";
-            this.tsbCreateNewVarEnvDef.Click += new System.EventHandler(this.tsbCreateNewVarEnvDef_Click);
+            this.tslSearch.Name = "tslSearch";
+            this.tslSearch.Size = new System.Drawing.Size(62, 41);
+            this.tslSearch.Text = "search";
             // 
-            // tsbDelete
+            // tstxtSearch
             // 
-            this.tsbDelete.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.Delete16;
-            this.tsbDelete.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.tsbDelete.Name = "tsbDelete";
-            this.tsbDelete.Size = new System.Drawing.Size(90, 41);
-            this.tsbDelete.Text = "Delete";
-            this.tsbDelete.ToolTipText = "Delete";
-            this.tsbDelete.Click += new System.EventHandler(this.tsbDelete_Click);
+            this.tstxtSearch.AutoToolTip = true;
+            this.tstxtSearch.Font = new System.Drawing.Font("Segoe UI", 9F);
+            this.tstxtSearch.Name = "tstxtSearch";
+            this.tstxtSearch.Size = new System.Drawing.Size(288, 34);
+            this.tstxtSearch.ToolTipText = "Search an environment variable";
+            this.tstxtSearch.TextChanged += new System.EventHandler(this.tstxtSearch_TextChanged);
             // 
             // EvmControl
             // 
@@ -323,5 +349,8 @@ namespace MscrmTools.EnvironmentVariableManager
         private System.Windows.Forms.ToolStripButton tsbCreateNewVarEnvDef;
         private System.Windows.Forms.ToolStripButton tsbDelete;
         private System.Windows.Forms.SplitContainer scMain;
+        private System.Windows.Forms.ToolStripLabel tslSearch;
+        private System.Windows.Forms.ToolStripTextBox tstxtSearch;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
     }
 }

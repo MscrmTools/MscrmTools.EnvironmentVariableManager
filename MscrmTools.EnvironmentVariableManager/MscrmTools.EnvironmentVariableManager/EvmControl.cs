@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Linq;
+using System.Threading;
 using System.Windows.Forms;
 using XrmToolBox.Extensibility;
 using XrmToolBox.Extensibility.Interfaces;
@@ -18,6 +19,8 @@ namespace MscrmTools.EnvironmentVariableManager
     {
         private readonly List<int> _rowsIndexChanged = new List<int>();
         private Guid currentDefinitionId;
+
+        private Thread searchThread;
 
         public EvmControl()
         {
@@ -285,6 +288,50 @@ Please correct the value: true or false", @"Error",
             gbEnvVariable.Text = "Environment Variable definition";
         }
 
+        private void DisplayRows(object filter = null)
+        {
+            CurrencyManager currencyManager1 = (CurrencyManager)BindingContext[dataGridView1.DataSource];
+            currencyManager1.SuspendBinding();
+
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() =>
+                {
+                    foreach (DataGridViewRow row in dataGridView1.Rows)
+                    {
+                        if (filter == null)
+                        {
+                            row.Visible = true;
+                            continue;
+                        }
+
+                        var isVisible = row.Cells[0].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0
+                                     || row.Cells[1].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0;
+
+                        row.Visible = isVisible;
+                    }
+                }));
+                currencyManager1.ResumeBinding();
+
+                return;
+            }
+
+            foreach (DataGridViewRow row in dataGridView1.Rows)
+            {
+                if (filter == null)
+                {
+                    row.Visible = true;
+                    continue;
+                }
+
+                var isVisible = row.Cells[0].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0
+                             || row.Cells[1].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0;
+
+                row.Visible = isVisible;
+            }
+            currencyManager1.ResumeBinding();
+        }
+
         private void LoadVariables()
         {
             var variables = Service.RetrieveMultiple(new QueryExpression("environmentvariabledefinition")
@@ -336,6 +383,8 @@ Please correct the value: true or false", @"Error",
             }
 
             dataGridView1.DataSource = table;
+
+            DisplayRows(tstxtSearch.Text);
 
             SetDatagridViewColumnsSettings();
             dataGridView1.CellValueChanged += DataGridView1_CellValueChanged;
@@ -534,5 +583,12 @@ Please correct the value: true or false", @"Error",
         public string EmailAccount => "tanguy92@hotmail.com";
 
         #endregion PayPal
+
+        private void tstxtSearch_TextChanged(object sender, EventArgs e)
+        {
+            searchThread?.Abort();
+            searchThread = new Thread(DisplayRows);
+            searchThread.Start(tstxtSearch.Text);
+        }
     }
 }
