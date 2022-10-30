@@ -3,6 +3,7 @@ using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
 using MscrmTools.EnvironmentVariableManager.Forms;
+using MscrmTools.EnvironmentVariableManager.AppCode;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -12,6 +13,7 @@ using System.Threading;
 using System.Windows.Forms;
 using XrmToolBox.Extensibility;
 using XrmToolBox.Extensibility.Interfaces;
+
 
 namespace MscrmTools.EnvironmentVariableManager
 {
@@ -200,12 +202,12 @@ Please correct the value", @"Error",
             }
             else if (type == 100000002)
             {
-                if (!bool.TryParse(changedCell.Value.ToString(), out bool _))
+                if (!Validator.ValidateBoolean(changedCell.Value.ToString()))
                 {
                     MessageBox.Show(this,
                         @"Provided value does not fit with data type Boolean.
 
-Please correct the value: true or false", @"Error",
+Please correct the value: yes or no", @"Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }

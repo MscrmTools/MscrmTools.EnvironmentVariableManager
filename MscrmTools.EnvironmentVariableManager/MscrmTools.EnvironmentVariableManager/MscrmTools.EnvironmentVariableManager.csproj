@@ -134,6 +134,7 @@
   <ItemGroup>
     <Compile Include="AppCode\ListViewItemComparer.cs" />
     <Compile Include="AppCode\Solution.Static.cs" />
+    <Compile Include="AppCode\Validator.cs" />
     <Compile Include="EvmPlugin.cs" />
     <Compile Include="EvmControl.cs">
       <SubType>UserControl</SubType>
