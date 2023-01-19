@@ -2,18 +2,18 @@
 using Microsoft.Crm.Sdk.Messages;
 using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
-using MscrmTools.EnvironmentVariableManager.Forms;
 using MscrmTools.EnvironmentVariableManager.AppCode;
+using MscrmTools.EnvironmentVariableManager.Forms;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 using XrmToolBox.Extensibility;
 using XrmToolBox.Extensibility.Interfaces;
-
 
 namespace MscrmTools.EnvironmentVariableManager
 {
@@ -190,7 +190,7 @@ namespace MscrmTools.EnvironmentVariableManager
             var type = int.Parse(dataGridView1.Rows[e.RowIndex].Cells[6].Value.ToString());
             if (type == 100000001)
             {
-                if (!decimal.TryParse(changedCell.Value.ToString(), out decimal _))
+                if (!decimal.TryParse(changedCell.Value.ToString(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture.NumberFormat, out decimal _))
                 {
                     MessageBox.Show(this,
                         @"Provided value does not fit with data type Decimal.
