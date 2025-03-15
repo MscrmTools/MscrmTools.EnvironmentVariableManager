@@ -7,6 +7,7 @@ using MscrmTools.EnvironmentVariableManager.Forms;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
@@ -39,6 +40,7 @@ namespace MscrmTools.EnvironmentVariableManager
             if (newService != null)
             {
                 LoadVariables();
+                LoadSolutions();
             }
         }
 
@@ -137,8 +139,6 @@ namespace MscrmTools.EnvironmentVariableManager
                                         ComponentType = 380,
                                         SolutionUniqueName = dialog.SelectedSolution.GetAttributeValue<string>("uniquename")
                                     });
-
-                                    def.Id = Service.Create(def);
                                 },
                                 PostWorkCallBack = evt2 =>
                                 {
@@ -308,7 +308,8 @@ Please correct the value: yes or no", @"Error",
                         }
 
                         var isVisible = row.Cells[0].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0
-                                     || row.Cells[1].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0;
+                                     || row.Cells[1].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0
+                                     || row.Cells[2].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0;
 
                         row.Visible = isVisible;
                     }
@@ -327,11 +328,175 @@ Please correct the value: yes or no", @"Error",
                 }
 
                 var isVisible = row.Cells[0].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0
-                             || row.Cells[1].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0;
+                             || row.Cells[1].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0
+                             || row.Cells[2].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0;
 
                 row.Visible = isVisible;
             }
             currencyManager1.ResumeBinding();
+        }
+
+        private void EvmControl_Resize(object sender, EventArgs e)
+        {
+            excelImportDialog1.Width = Convert.ToInt32(Width * 0.9);
+            excelImportDialog1.Height = Convert.ToInt32(Height * 0.9);
+            excelImportDialog1.Location = new Point(Width / 2 - excelImportDialog1.Width / 2, Height / 2 - excelImportDialog1.Height / 2);
+        }
+
+        private void ExcelImportDialog1_OnImportRequested(object sender, UpdateEnvironmentVariablesEventArgs e)
+        {
+            if (DialogResult.Yes == MessageBox.Show(this, $"Are you sure you want to import {e.Variables.Count} environment variables?", "Question", MessageBoxButtons.YesNo, MessageBoxIcon.Question))
+            {
+                WorkAsync(new WorkAsyncInfo
+                {
+                    Message = "Importing environment variables...",
+                    Work = (bw, evt) =>
+                    {
+                        foreach (var variable in e.Variables)
+                        {
+                            if (variable.Id == Guid.Empty)
+                            {
+                                bw.ReportProgress(0, $"Creating variable '{variable.GetAttributeValue<string>("schemaname")}'...");
+
+                                // Creating the new Environment Variable definition
+                                var def = new Entity("environmentvariabledefinition")
+                                {
+                                    Attributes =
+                                    {
+                                        {"schemaname",variable.GetAttributeValue<string>("schemaname")},
+                                        {"displayname", variable.GetAttributeValue<string>("displayname")},
+                                        {"description", variable.GetAttributeValue<string>("description")},
+                                    }
+                                };
+
+                                switch (variable.GetAttributeValue<string>("type"))
+                                {
+                                    case "String":
+                                        def["type"] = new OptionSetValue(100000000);
+                                        break;
+
+                                    case "Number":
+                                        def["type"] = new OptionSetValue(100000001);
+                                        break;
+
+                                    case "Boolean":
+                                        def["type"] = new OptionSetValue(100000002);
+                                        break;
+
+                                    case "JSON":
+                                        def["type"] = new OptionSetValue(100000003);
+                                        break;
+
+                                    case "Connection reference":
+                                        def["type"] = new OptionSetValue(100000004);
+                                        break;
+
+                                    case "Secret":
+                                        def["type"] = new OptionSetValue(100000005);
+                                        break;
+
+                                    default:
+                                        MessageBox.Show(this, @"Please select a type for the environment variable", @"Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                                        return;
+                                }
+
+                                def.Id = Service.Create(def);
+                                variable.Id = def.Id;
+
+                                if (!string.IsNullOrEmpty(variable.GetAttributeValue<string>("solutionuniquename")))
+                                {
+                                    bw.ReportProgress(0, $"Adding variable '{variable.GetAttributeValue<string>("schemaname")}' to selected solution...");
+
+                                    Service.Execute(new AddSolutionComponentRequest
+                                    {
+                                        ComponentId = def.Id,
+                                        ComponentType = 380,
+                                        SolutionUniqueName = variable.GetAttributeValue<string>("solutionuniquename")
+                                    });
+                                }
+
+                                Service.Create(new Entity("environmentvariablevalue")
+                                {
+                                    Attributes =
+                                    {
+                                        {"environmentvariabledefinitionid",def.ToEntityReference()},
+                                        {"value", variable.GetAttributeValue<string>("value") }
+                                    }
+                                });
+                            }
+
+                            bw.ReportProgress(0, $"Udpating variable '{variable.GetAttributeValue<string>("schemaname")}'...");
+
+                            var varToUpdate = Service.RetrieveMultiple(new QueryExpression("environmentvariablevalue")
+                            {
+                                Criteria =
+                                {
+                                    Conditions =
+                                    {
+                                        new ConditionExpression("environmentvariabledefinitionid", ConditionOperator.Equal, variable.Id)
+                                    }
+                                }
+                            }).Entities.First();
+
+                            varToUpdate["value"] = variable.GetAttributeValue<string>("value");
+
+                            Service.Update(varToUpdate);
+                        }
+                    },
+                    ProgressChanged = evt =>
+                    {
+                        SetWorkingMessage(evt.UserState.ToString());
+                    },
+                    PostWorkCallBack = evt =>
+                    {
+                        if (evt.Error != null)
+                        {
+                            MessageBox.Show(this, "An error occured when importing Environment Variables: " + evt.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            return;
+                        }
+
+                        excelImportDialog1.Visible = false;
+                        excelImportDialog1.Reset();
+                        LoadVariables();
+                    }
+                });
+            }
+        }
+
+        private EntityCollection GetVariables()
+        {
+            return Service.RetrieveMultiple(new QueryExpression("environmentvariabledefinition")
+            {
+                NoLock = true,
+                ColumnSet = new ColumnSet("displayname", "schemaname", "type", "description"),
+                LinkEntities =
+                                {
+                                    new LinkEntity
+                                    {
+                                        JoinOperator = JoinOperator.LeftOuter,
+                                        LinkFromEntityName = "environmentvariabledefinition",
+                                        LinkFromAttributeName = "environmentvariabledefinitionid",
+                                        LinkToAttributeName = "environmentvariabledefinitionid",
+                                        LinkToEntityName = "environmentvariablevalue",
+                                        Columns = new ColumnSet("value","environmentvariablevalueid"),
+                                        EntityAlias = "val",
+                                    }
+                                },
+                Orders = { new OrderExpression("displayname", OrderType.Ascending) }
+            });
+        }
+
+        private void LoadSolutions()
+        {
+            QueryExpression qe = new QueryExpression("solution");
+            qe.Distinct = true;
+            qe.ColumnSet = Solution.Columns;
+            qe.Criteria = new FilterExpression();
+            qe.Criteria.AddCondition(new ConditionExpression("ismanaged", ConditionOperator.Equal, false));
+            qe.Criteria.AddCondition(new ConditionExpression("isvisible", ConditionOperator.Equal, true));
+            qe.Criteria.AddCondition(new ConditionExpression("uniquename", ConditionOperator.NotEqual, "Default"));
+
+            excelImportDialog1.Solutions = Service.RetrieveMultiple(qe).Entities.ToList();
         }
 
         private void LoadVariables()
@@ -408,6 +573,7 @@ Please correct the value: yes or no", @"Error",
             if (e.ClickedItem == tsbLoad)
             {
                 ExecuteMethod(LoadVariables);
+                LoadSolutions();
             }
         }
 
@@ -461,6 +627,52 @@ Please correct the value: yes or no", @"Error",
                     LoadVariables();
                 }
             });
+        }
+
+        private void tsbExportExcel_Click(object sender, EventArgs e)
+        {
+            using (var sfd = new SaveFileDialog { AddExtension = true, DefaultExt = "xlsx", Filter = "Excel files|*.xlsx", FileName = "EnvironmentVariables.xlsx" })
+            {
+                if (sfd.ShowDialog(this) == DialogResult.OK)
+                {
+                    WorkAsync(new WorkAsyncInfo
+                    {
+                        Message = "Exporting environment variables to Excel...",
+                        Work = (bw, evt) =>
+                        {
+                            EntityCollection variables = GetVariables();
+
+                            var excelManager = new ExcelManager(sfd.FileName);
+                            excelManager.ExportToExcel(variables.Entities.ToList(), ConnectionDetail.OrganizationFriendlyName);
+                        },
+                        PostWorkCallBack = evt =>
+                        {
+                            if (evt.Error != null)
+                            {
+                                MessageBox.Show(this, $"An error occured when exporting the environment variables: {evt.Error.Message}", @"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                return;
+                            }
+
+                            if (DialogResult.Yes == MessageBox.Show(this, "Environment variables have been exported to Excel.\n\nWould you like to open the file now?", @"Information", MessageBoxButtons.YesNo, MessageBoxIcon.Information))
+                            {
+                                Process.Start(sfd.FileName);
+                            }
+                        },
+                        ProgressChanged = evt =>
+                        {
+                            SetWorkingMessage(evt.UserState.ToString());
+                        }
+                    });
+                }
+            }
+        }
+
+        private void tsbImportFromExcel_Click(object sender, EventArgs e)
+        {
+            excelImportDialog1.Visible = true;
+            excelImportDialog1.Variables = GetVariables().Entities.ToList();
+            excelImportDialog1.OnImportRequested -= ExcelImportDialog1_OnImportRequested;
+            excelImportDialog1.OnImportRequested += ExcelImportDialog1_OnImportRequested;
         }
 
         private void tsbUpdate_Click(object sender, EventArgs e)

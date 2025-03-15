@@ -14,8 +14,11 @@ namespace MscrmTools.EnvironmentVariableManager
         /// <param name="disposing">true si les ressources managées doivent être supprimées ; sinon, false.</param>
         protected override void Dispose(bool disposing)
         {
+            excelImportDialog1.Dispose();
+
             if (disposing && (components != null))
             {
+                
                 components.Dispose();
             }
             base.Dispose(disposing);
@@ -32,9 +35,15 @@ namespace MscrmTools.EnvironmentVariableManager
             this.toolStripMenu = new System.Windows.Forms.ToolStrip();
             this.tsbLoad = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.tslSearch = new System.Windows.Forms.ToolStripLabel();
+            this.tstxtSearch = new System.Windows.Forms.ToolStripTextBox();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.tsbUpdate = new System.Windows.Forms.ToolStripButton();
             this.tsbCreateNewVarEnvDef = new System.Windows.Forms.ToolStripButton();
             this.tsbDelete = new System.Windows.Forms.ToolStripButton();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsbExportExcel = new System.Windows.Forms.ToolStripButton();
+            this.tsbImportFromExcel = new System.Windows.Forms.ToolStripButton();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.gbEnvVariable = new System.Windows.Forms.GroupBox();
             this.btnValidateEnv = new System.Windows.Forms.Button();
@@ -49,9 +58,7 @@ namespace MscrmTools.EnvironmentVariableManager
             this.txtDisplayName = new System.Windows.Forms.TextBox();
             this.lblDisplayName = new System.Windows.Forms.Label();
             this.scMain = new System.Windows.Forms.SplitContainer();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
-            this.tslSearch = new System.Windows.Forms.ToolStripLabel();
-            this.tstxtSearch = new System.Windows.Forms.ToolStripTextBox();
+            this.excelImportDialog1 = new MscrmTools.EnvironmentVariableManager.UserControls.ExcelImportDialog();
             this.toolStripMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.gbEnvVariable.SuspendLayout();
@@ -63,6 +70,7 @@ namespace MscrmTools.EnvironmentVariableManager
             // 
             // toolStripMenu
             // 
+            this.toolStripMenu.ImageScalingSize = new System.Drawing.Size(32, 32);
             this.toolStripMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsbLoad,
             this.toolStripSeparator1,
@@ -71,10 +79,13 @@ namespace MscrmTools.EnvironmentVariableManager
             this.toolStripSeparator2,
             this.tsbUpdate,
             this.tsbCreateNewVarEnvDef,
-            this.tsbDelete});
+            this.tsbDelete,
+            this.toolStripSeparator3,
+            this.tsbExportExcel,
+            this.tsbImportFromExcel});
             this.toolStripMenu.Location = new System.Drawing.Point(0, 0);
             this.toolStripMenu.Name = "toolStripMenu";
-            this.toolStripMenu.Size = new System.Drawing.Size(1352, 34);
+            this.toolStripMenu.Size = new System.Drawing.Size(1352, 41);
             this.toolStripMenu.TabIndex = 4;
             this.toolStripMenu.Text = "tsMain";
             this.toolStripMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.toolStripMenu_ItemClicked);
@@ -83,41 +94,83 @@ namespace MscrmTools.EnvironmentVariableManager
             // 
             this.tsbLoad.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.tsbLoad.Name = "tsbLoad";
-            this.tsbLoad.Size = new System.Drawing.Size(234, 41);
+            this.tsbLoad.Size = new System.Drawing.Size(234, 36);
             this.tsbLoad.Text = "Load Environment variables";
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 46);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 41);
+            // 
+            // tslSearch
+            // 
+            this.tslSearch.Name = "tslSearch";
+            this.tslSearch.Size = new System.Drawing.Size(62, 36);
+            this.tslSearch.Text = "search";
+            // 
+            // tstxtSearch
+            // 
+            this.tstxtSearch.AutoToolTip = true;
+            this.tstxtSearch.Name = "tstxtSearch";
+            this.tstxtSearch.Size = new System.Drawing.Size(288, 41);
+            this.tstxtSearch.ToolTipText = "Search an environment variable";
+            this.tstxtSearch.TextChanged += new System.EventHandler(this.tstxtSearch_TextChanged);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 41);
             // 
             // tsbUpdate
             // 
-            this.tsbUpdate.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.Save_16;
+            this.tsbUpdate.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.save;
             this.tsbUpdate.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbUpdate.Name = "tsbUpdate";
-            this.tsbUpdate.Size = new System.Drawing.Size(98, 41);
+            this.tsbUpdate.Size = new System.Drawing.Size(106, 36);
             this.tsbUpdate.Text = "Update";
             this.tsbUpdate.Click += new System.EventHandler(this.tsbUpdate_Click);
             // 
             // tsbCreateNewVarEnvDef
             // 
-            this.tsbCreateNewVarEnvDef.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.add_hover_16_new;
+            this.tsbCreateNewVarEnvDef.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.plus;
             this.tsbCreateNewVarEnvDef.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbCreateNewVarEnvDef.Name = "tsbCreateNewVarEnvDef";
-            this.tsbCreateNewVarEnvDef.Size = new System.Drawing.Size(246, 41);
+            this.tsbCreateNewVarEnvDef.Size = new System.Drawing.Size(254, 36);
             this.tsbCreateNewVarEnvDef.Text = "New Environment variable";
             this.tsbCreateNewVarEnvDef.Click += new System.EventHandler(this.tsbCreateNewVarEnvDef_Click);
             // 
             // tsbDelete
             // 
-            this.tsbDelete.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.Delete16;
+            this.tsbDelete.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.delete;
             this.tsbDelete.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbDelete.Name = "tsbDelete";
-            this.tsbDelete.Size = new System.Drawing.Size(90, 41);
+            this.tsbDelete.Size = new System.Drawing.Size(98, 36);
             this.tsbDelete.Text = "Delete";
             this.tsbDelete.ToolTipText = "Delete";
             this.tsbDelete.Click += new System.EventHandler(this.tsbDelete_Click);
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 41);
+            // 
+            // tsbExportExcel
+            // 
+            this.tsbExportExcel.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.export;
+            this.tsbExportExcel.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbExportExcel.Name = "tsbExportExcel";
+            this.tsbExportExcel.Size = new System.Drawing.Size(99, 36);
+            this.tsbExportExcel.Text = "Export";
+            this.tsbExportExcel.Click += new System.EventHandler(this.tsbExportExcel_Click);
+            // 
+            // tsbImportFromExcel
+            // 
+            this.tsbImportFromExcel.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.import;
+            this.tsbImportFromExcel.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.tsbImportFromExcel.Name = "tsbImportFromExcel";
+            this.tsbImportFromExcel.Size = new System.Drawing.Size(103, 36);
+            this.tsbImportFromExcel.Text = "Import";
+            this.tsbImportFromExcel.Click += new System.EventHandler(this.tsbImportFromExcel_Click);
             // 
             // dataGridView1
             // 
@@ -129,7 +182,8 @@ namespace MscrmTools.EnvironmentVariableManager
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 62;
             this.dataGridView1.RowTemplate.Height = 28;
-            this.dataGridView1.Size = new System.Drawing.Size(888, 757);
+            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
+            this.dataGridView1.Size = new System.Drawing.Size(888, 750);
             this.dataGridView1.TabIndex = 5;
             this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
             this.dataGridView1.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_RowEnter);
@@ -151,7 +205,7 @@ namespace MscrmTools.EnvironmentVariableManager
             this.gbEnvVariable.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.gbEnvVariable.Location = new System.Drawing.Point(0, 0);
             this.gbEnvVariable.Name = "gbEnvVariable";
-            this.gbEnvVariable.Size = new System.Drawing.Size(460, 757);
+            this.gbEnvVariable.Size = new System.Drawing.Size(460, 750);
             this.gbEnvVariable.TabIndex = 6;
             this.gbEnvVariable.TabStop = false;
             this.gbEnvVariable.Text = "New environment variable ";
@@ -271,7 +325,7 @@ namespace MscrmTools.EnvironmentVariableManager
             // scMain
             // 
             this.scMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.scMain.Location = new System.Drawing.Point(0, 34);
+            this.scMain.Location = new System.Drawing.Point(0, 41);
             this.scMain.Name = "scMain";
             // 
             // scMain.Panel1
@@ -281,39 +335,31 @@ namespace MscrmTools.EnvironmentVariableManager
             // scMain.Panel2
             // 
             this.scMain.Panel2.Controls.Add(this.gbEnvVariable);
-            this.scMain.Size = new System.Drawing.Size(1352, 757);
+            this.scMain.Size = new System.Drawing.Size(1352, 750);
             this.scMain.SplitterDistance = 888;
             this.scMain.TabIndex = 7;
             // 
-            // toolStripSeparator2
+            // excelImportDialog1
             // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 46);
-            // 
-            // tslSearch
-            // 
-            this.tslSearch.Name = "tslSearch";
-            this.tslSearch.Size = new System.Drawing.Size(62, 41);
-            this.tslSearch.Text = "search";
-            // 
-            // tstxtSearch
-            // 
-            this.tstxtSearch.AutoToolTip = true;
-            this.tstxtSearch.Font = new System.Drawing.Font("Segoe UI", 9F);
-            this.tstxtSearch.Name = "tstxtSearch";
-            this.tstxtSearch.Size = new System.Drawing.Size(288, 34);
-            this.tstxtSearch.ToolTipText = "Search an environment variable";
-            this.tstxtSearch.TextChanged += new System.EventHandler(this.tstxtSearch_TextChanged);
+            this.excelImportDialog1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.excelImportDialog1.Location = new System.Drawing.Point(-7, 70);
+            this.excelImportDialog1.Name = "excelImportDialog1";
+            this.excelImportDialog1.Size = new System.Drawing.Size(1414, 71);
+            this.excelImportDialog1.TabIndex = 8;
+            this.excelImportDialog1.Variables = null;
+            this.excelImportDialog1.Visible = false;
             // 
             // EvmControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.excelImportDialog1);
             this.Controls.Add(this.scMain);
             this.Controls.Add(this.toolStripMenu);
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "EvmControl";
             this.Size = new System.Drawing.Size(1352, 791);
+            this.Resize += new System.EventHandler(this.EvmControl_Resize);
             this.toolStripMenu.ResumeLayout(false);
             this.toolStripMenu.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
@@ -352,5 +398,9 @@ namespace MscrmTools.EnvironmentVariableManager
         private System.Windows.Forms.ToolStripLabel tslSearch;
         private System.Windows.Forms.ToolStripTextBox tstxtSearch;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripButton tsbExportExcel;
+        private System.Windows.Forms.ToolStripButton tsbImportFromExcel;
+        private UserControls.ExcelImportDialog excelImportDialog1;
     }
 }
