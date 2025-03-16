@@ -275,14 +275,17 @@ Please correct the value: yes or no", @"Error",
                            new ConditionExpression("environmentvariabledefinitionid", ConditionOperator.Equal, defId)
                        }
                     }
-                }).Entities.First();
+                }).Entities.FirstOrDefault();
 
-                txtDisplayName.Text = def.GetAttributeValue<string>("displayname");
-                txtUniqueName.Text = def.GetAttributeValue<string>("schemaname");
-                txtDescription.Text = def.GetAttributeValue<string>("description");
-                txtDefaultValue.Text = def.GetAttributeValue<string>("defaultvalue");
-                cbbType.SelectedItem = def.FormattedValues["type"];
-                scMain.Panel2Collapsed = false;
+                if (def != null)
+                {
+                    txtDisplayName.Text = def.GetAttributeValue<string>("displayname");
+                    txtUniqueName.Text = def.GetAttributeValue<string>("schemaname");
+                    txtDescription.Text = def.GetAttributeValue<string>("description");
+                    txtDefaultValue.Text = def.GetAttributeValue<string>("defaultvalue");
+                    cbbType.SelectedItem = def.FormattedValues["type"];
+                    scMain.Panel2Collapsed = false;
+                }
             }
 
             txtUniqueName.Enabled = false;
@@ -292,9 +295,6 @@ Please correct the value: yes or no", @"Error",
 
         private void DisplayRows(object filter = null)
         {
-            CurrencyManager currencyManager1 = (CurrencyManager)BindingContext[dataGridView1.DataSource];
-            currencyManager1.SuspendBinding();
-
             if (InvokeRequired)
             {
                 Invoke(new Action(() =>
@@ -314,7 +314,6 @@ Please correct the value: yes or no", @"Error",
                         row.Visible = isVisible;
                     }
                 }));
-                currencyManager1.ResumeBinding();
 
                 return;
             }
@@ -327,13 +326,12 @@ Please correct the value: yes or no", @"Error",
                     continue;
                 }
 
-                var isVisible = row.Cells[0].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0
-                             || row.Cells[1].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0
-                             || row.Cells[2].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0;
+                var isVisible = row.Cells[0].Value != null && row.Cells[0].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0
+                             || row.Cells[1].Value != null && row.Cells[1].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0
+                             || row.Cells[2].Value != null && row.Cells[2].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0;
 
                 row.Visible = isVisible;
             }
-            currencyManager1.ResumeBinding();
         }
 
         private void EvmControl_Resize(object sender, EventArgs e)
@@ -516,40 +514,87 @@ Please correct the value: yes or no", @"Error",
                         LinkToEntityName = "environmentvariablevalue",
                         Columns = new ColumnSet("value","environmentvariablevalueid"),
                         EntityAlias = "val",
+                        LinkEntities =
+                        {
+                            new LinkEntity
+                            {
+                                JoinOperator = JoinOperator.LeftOuter,
+                                LinkFromEntityName = "environmentvariablevalue",
+                                LinkFromAttributeName = "environmentvariablevalueid",
+                                LinkToAttributeName = "objectid",
+                                LinkToEntityName = "solutioncomponent",
+                                Columns = new ColumnSet("solutioncomponentid"),
+                                EntityAlias = "solutionComponent",
+                                LinkEntities =
+                                {
+                                    new LinkEntity
+                                    {
+                                        JoinOperator = JoinOperator.LeftOuter,
+                                        LinkFromEntityName = "solutioncomponent",
+                                        LinkFromAttributeName = "solutionid",
+                                        LinkToAttributeName = "solutionid",
+                                        LinkToEntityName = "solution",
+                                        Columns = new ColumnSet("friendlyname","uniquename"),
+                                          LinkCriteria = new FilterExpression
+                                          {
+                                              Conditions =
+                                              {
+                                                  new ConditionExpression("uniquename", ConditionOperator.NotEqual, "Default"),
+                                                  new ConditionExpression("uniquename", ConditionOperator.NotEqual, "Active"),
+                                                  new ConditionExpression("ismanaged", ConditionOperator.Equal, true),
+                                              }
+                                          }
+                                    }
+                                }
+                            }
+                        }
                     }
                 },
                 Orders = { new OrderExpression("displayname", OrderType.Ascending) }
             });
 
-            var table = new DataTable();
-            table.Columns.Add(new DataColumn("Variable name") { ReadOnly = true });
-            table.Columns.Add(new DataColumn("Schema name") { ReadOnly = true });
-            table.Columns.Add(new DataColumn("Value"));
-            table.Columns.Add(new DataColumn("ValueId"));
-            table.Columns.Add(new DataColumn("DefId") { ReadOnly = true });
-            table.Columns.Add(new DataColumn("Type") { ReadOnly = true });
-            table.Columns.Add(new DataColumn("TypeInt") { ReadOnly = true });
-
-            foreach (var variable in variables.Entities)
+            foreach (var variableGroup in variables.Entities.GroupBy(g => g.GetAttributeValue<string>("schemaname")))
             {
+                var variable = variableGroup.First();
+                var solutions = variableGroup.Where(vg => vg.GetAttributeValue<AliasedValue>("solution1.friendlyname") != null).ToList();
+                var solutionsList = "";
+
                 Guid id = Guid.Empty;
                 if (variable.GetAttributeValue<AliasedValue>("val.environmentvariablevalueid") != null)
                 {
                     id = (Guid)variable.GetAttributeValue<AliasedValue>("val.environmentvariablevalueid").Value;
                 }
 
-                table.Rows.Add(
-                    variable.GetAttributeValue<string>("displayname"),
-                    variable.GetAttributeValue<string>("schemaname"),
-                    variable.GetAttributeValue<AliasedValue>("val.value")?.Value?.ToString() ?? "",
-                    id.ToString(),
-                    variable.Id,
-                    variable.FormattedValues["type"],
-                    variable.GetAttributeValue<OptionSetValue>("type").Value
+                string ttt = string.Empty;
+                if (solutions.Count > 0)
+                {
+                    solutionsList = string.Join("\n- ", solutions.Select(vg => vg.GetAttributeValue<AliasedValue>("solution1.friendlyname").Value.ToString()).ToList());
+
+                    ttt = $@"This environment variable value has been imported with a managed solution.
+
+Be careful! If you import the same solution(s) using Upgrade method and you overwrite unmanaged customization, this could lead to a removal of this environment variable value.
+
+The solution involved are the following:
+- {solutionsList}
+";
+                }
+
+                dataGridView1.Rows.Add(
+                    new DataGridViewRow
+                    {
+                        Cells =
+                        {
+                            new TextAndImageCell{Value = variable.GetAttributeValue<string>("displayname"),DisplayWarningImage= solutions.Count > 0, ToolTipText = ttt},
+                            new DataGridViewTextBoxCell{Value = variable.GetAttributeValue<string>("schemaname")},
+                            new DataGridViewTextBoxCell{Value = variable.GetAttributeValue<AliasedValue>("val.value")?.Value?.ToString() ?? ""},
+                            new DataGridViewTextBoxCell{Value = id.ToString()},
+                            new DataGridViewTextBoxCell{Value = variable.Id.ToString()},
+                            new DataGridViewTextBoxCell{Value = variable.FormattedValues["type"]},
+                            new DataGridViewTextBoxCell{Value = variable.GetAttributeValue<OptionSetValue>("type").Value.ToString()}
+                        }
+                    }
                 );
             }
-
-            dataGridView1.DataSource = table;
 
             DisplayRows(tstxtSearch.Text);
 

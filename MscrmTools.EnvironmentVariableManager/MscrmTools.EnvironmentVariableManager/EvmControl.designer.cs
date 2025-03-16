@@ -45,6 +45,13 @@ namespace MscrmTools.EnvironmentVariableManager
             this.tsbExportExcel = new System.Windows.Forms.ToolStripButton();
             this.tsbImportFromExcel = new System.Windows.Forms.ToolStripButton();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.Column1 = new MscrmTools.EnvironmentVariableManager.AppCode.TextAndImageColumn();
+            this.SchemaName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Value = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Id1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Id2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.TypeInt = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Type = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.gbEnvVariable = new System.Windows.Forms.GroupBox();
             this.btnValidateEnv = new System.Windows.Forms.Button();
             this.txtDefaultValue = new System.Windows.Forms.TextBox();
@@ -111,6 +118,7 @@ namespace MscrmTools.EnvironmentVariableManager
             // tstxtSearch
             // 
             this.tstxtSearch.AutoToolTip = true;
+            this.tstxtSearch.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.tstxtSearch.Name = "tstxtSearch";
             this.tstxtSearch.Size = new System.Drawing.Size(288, 41);
             this.tstxtSearch.ToolTipText = "Search an environment variable";
@@ -177,6 +185,14 @@ namespace MscrmTools.EnvironmentVariableManager
             this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.AllowUserToDeleteRows = false;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.Column1,
+            this.SchemaName,
+            this.Value,
+            this.Id1,
+            this.Id2,
+            this.TypeInt,
+            this.Type});
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView1.Location = new System.Drawing.Point(0, 0);
             this.dataGridView1.Name = "dataGridView1";
@@ -187,6 +203,62 @@ namespace MscrmTools.EnvironmentVariableManager
             this.dataGridView1.TabIndex = 5;
             this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
             this.dataGridView1.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_RowEnter);
+            // 
+            // Column1
+            // 
+            this.Column1.HeaderText = "Variable name";
+            this.Column1.Image = null;
+            this.Column1.MinimumWidth = 8;
+            this.Column1.Name = "Column1";
+            this.Column1.ReadOnly = true;
+            this.Column1.Width = 150;
+            // 
+            // SchemaName
+            // 
+            this.SchemaName.HeaderText = "Schema name";
+            this.SchemaName.MinimumWidth = 8;
+            this.SchemaName.Name = "SchemaName";
+            this.SchemaName.ReadOnly = true;
+            this.SchemaName.Width = 150;
+            // 
+            // Value
+            // 
+            this.Value.HeaderText = "Value";
+            this.Value.MinimumWidth = 8;
+            this.Value.Name = "Value";
+            this.Value.Width = 150;
+            // 
+            // Id1
+            // 
+            this.Id1.HeaderText = "Id1";
+            this.Id1.MinimumWidth = 8;
+            this.Id1.Name = "Id1";
+            this.Id1.Visible = false;
+            this.Id1.Width = 150;
+            // 
+            // Id2
+            // 
+            this.Id2.HeaderText = "Id2";
+            this.Id2.MinimumWidth = 8;
+            this.Id2.Name = "Id2";
+            this.Id2.Visible = false;
+            this.Id2.Width = 150;
+            // 
+            // TypeInt
+            // 
+            this.TypeInt.HeaderText = "TypeInt";
+            this.TypeInt.MinimumWidth = 8;
+            this.TypeInt.Name = "TypeInt";
+            this.TypeInt.Visible = false;
+            this.TypeInt.Width = 150;
+            // 
+            // Type
+            // 
+            this.Type.HeaderText = "Type";
+            this.Type.MinimumWidth = 8;
+            this.Type.Name = "Type";
+            this.Type.ReadOnly = true;
+            this.Type.Width = 150;
             // 
             // gbEnvVariable
             // 
@@ -402,5 +474,12 @@ namespace MscrmTools.EnvironmentVariableManager
         private System.Windows.Forms.ToolStripButton tsbExportExcel;
         private System.Windows.Forms.ToolStripButton tsbImportFromExcel;
         private UserControls.ExcelImportDialog excelImportDialog1;
+        private AppCode.TextAndImageColumn Column1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn SchemaName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Value;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Id1;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Id2;
+        private System.Windows.Forms.DataGridViewTextBoxColumn TypeInt;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Type;
     }
 }

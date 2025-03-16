@@ -221,6 +221,8 @@
     <Compile Include="AppCode\ListViewItemComparer.cs" />
     <Compile Include="AppCode\Solution.Static.cs" />
     <Compile Include="AppCode\SolutionInfo.cs" />
+    <Compile Include="AppCode\TextAndImageCell.cs" />
+    <Compile Include="AppCode\TextAndImageColumn.cs" />
     <Compile Include="AppCode\UpdateEnvironmentVariablesEventArgs.cs" />
     <Compile Include="AppCode\Validator.cs" />
     <Compile Include="EvmPlugin.cs" />
@@ -297,6 +299,7 @@
     <None Include="Resources\add_hover_16_new.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\warning16.png" />
     <None Include="Resources\equal.png" />
     <None Include="Resources\export.png" />
     <None Include="Resources\import.png" />
