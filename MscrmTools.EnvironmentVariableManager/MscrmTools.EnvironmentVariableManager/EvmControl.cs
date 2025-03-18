@@ -553,6 +553,8 @@ Please correct the value: yes or no", @"Error",
                 Orders = { new OrderExpression("displayname", OrderType.Ascending) }
             });
 
+            dataGridView1.Rows.Clear();
+
             foreach (var variableGroup in variables.Entities.GroupBy(g => g.GetAttributeValue<string>("schemaname")))
             {
                 var variable = variableGroup.First();
