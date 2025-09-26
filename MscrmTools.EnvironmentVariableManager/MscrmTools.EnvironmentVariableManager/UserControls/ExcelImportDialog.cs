@@ -101,7 +101,7 @@ namespace MscrmTools.EnvironmentVariableManager.UserControls
             table.Columns.Add(new DataColumn("Current Value"));
             table.Columns.Add(new DataColumn("Value"));
             table.Columns.Add(new DataColumn("Type") { ReadOnly = true });
-            table.Columns.Add(new DataColumn("Status") { DataType = typeof(byte[]), AllowDBNull = true });
+            table.Columns.Add(new DataColumn("Status") { ReadOnly = true });
             table.Columns.Add(new DataColumn("Description") { ReadOnly = true });
 
             var ws = ((ExcelWorksheet)cbbSheets.SelectedItem);
@@ -118,7 +118,7 @@ namespace MscrmTools.EnvironmentVariableManager.UserControls
                     variable != null ? variable.GetAttributeValue<AliasedValue>("val.value")?.Value : string.Empty,
                     ws.GetValue<string>(i, 4),
                     ws.GetValue<string>(i, 5),
-                    imageToByteArray(isNew ? Properties.Resources._new : isChange ? Properties.Resources.update : Properties.Resources.equal),
+                    isNew ? "New" : isChange ? "Update" : "Same",
                     ws.GetValue<string>(i, 3)
                     );
             }
@@ -131,6 +131,13 @@ namespace MscrmTools.EnvironmentVariableManager.UserControls
                 {
                     row.Cells[2].Style.BackColor = System.Drawing.Color.LightCoral;
                     row.Cells[3].Style.BackColor = System.Drawing.Color.LightGreen;
+                }
+                else
+                {
+                    foreach (DataGridViewCell cell in row.Cells)
+                    {
+                        cell.Style.BackColor = System.Drawing.Color.LightGray;
+                    }
                 }
             }
 
