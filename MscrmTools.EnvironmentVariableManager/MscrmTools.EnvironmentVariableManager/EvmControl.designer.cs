@@ -32,6 +32,7 @@ namespace MscrmTools.EnvironmentVariableManager
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.toolStripMenu = new System.Windows.Forms.ToolStrip();
             this.tsbLoad = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -66,6 +67,10 @@ namespace MscrmTools.EnvironmentVariableManager
             this.lblDisplayName = new System.Windows.Forms.Label();
             this.scMain = new System.Windows.Forms.SplitContainer();
             this.excelImportDialog1 = new MscrmTools.EnvironmentVariableManager.UserControls.ExcelImportDialog();
+            this.cmsEnvs = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.tsmiCopySchemaName = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiCopyName = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsmiCopyValue = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenu.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.gbEnvVariable.SuspendLayout();
@@ -73,6 +78,7 @@ namespace MscrmTools.EnvironmentVariableManager
             this.scMain.Panel1.SuspendLayout();
             this.scMain.Panel2.SuspendLayout();
             this.scMain.SuspendLayout();
+            this.cmsEnvs.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStripMenu
@@ -92,7 +98,7 @@ namespace MscrmTools.EnvironmentVariableManager
             this.tsbImportFromExcel});
             this.toolStripMenu.Location = new System.Drawing.Point(0, 0);
             this.toolStripMenu.Name = "toolStripMenu";
-            this.toolStripMenu.Size = new System.Drawing.Size(1352, 41);
+            this.toolStripMenu.Size = new System.Drawing.Size(1572, 39);
             this.toolStripMenu.TabIndex = 4;
             this.toolStripMenu.Text = "tsMain";
             this.toolStripMenu.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.toolStripMenu_ItemClicked);
@@ -101,18 +107,18 @@ namespace MscrmTools.EnvironmentVariableManager
             // 
             this.tsbLoad.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.tsbLoad.Name = "tsbLoad";
-            this.tsbLoad.Size = new System.Drawing.Size(234, 36);
+            this.tsbLoad.Size = new System.Drawing.Size(196, 36);
             this.tsbLoad.Text = "Load Environment variables";
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 41);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 39);
             // 
             // tslSearch
             // 
             this.tslSearch.Name = "tslSearch";
-            this.tslSearch.Size = new System.Drawing.Size(62, 36);
+            this.tslSearch.Size = new System.Drawing.Size(51, 36);
             this.tslSearch.Text = "search";
             // 
             // tstxtSearch
@@ -120,21 +126,21 @@ namespace MscrmTools.EnvironmentVariableManager
             this.tstxtSearch.AutoToolTip = true;
             this.tstxtSearch.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.tstxtSearch.Name = "tstxtSearch";
-            this.tstxtSearch.Size = new System.Drawing.Size(288, 41);
+            this.tstxtSearch.Size = new System.Drawing.Size(256, 39);
             this.tstxtSearch.ToolTipText = "Search an environment variable";
             this.tstxtSearch.TextChanged += new System.EventHandler(this.tstxtSearch_TextChanged);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 41);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 39);
             // 
             // tsbUpdate
             // 
             this.tsbUpdate.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.save;
             this.tsbUpdate.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbUpdate.Name = "tsbUpdate";
-            this.tsbUpdate.Size = new System.Drawing.Size(106, 36);
+            this.tsbUpdate.Size = new System.Drawing.Size(94, 36);
             this.tsbUpdate.Text = "Update";
             this.tsbUpdate.Click += new System.EventHandler(this.tsbUpdate_Click);
             // 
@@ -143,7 +149,7 @@ namespace MscrmTools.EnvironmentVariableManager
             this.tsbCreateNewVarEnvDef.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.plus;
             this.tsbCreateNewVarEnvDef.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbCreateNewVarEnvDef.Name = "tsbCreateNewVarEnvDef";
-            this.tsbCreateNewVarEnvDef.Size = new System.Drawing.Size(254, 36);
+            this.tsbCreateNewVarEnvDef.Size = new System.Drawing.Size(219, 36);
             this.tsbCreateNewVarEnvDef.Text = "New Environment variable";
             this.tsbCreateNewVarEnvDef.Click += new System.EventHandler(this.tsbCreateNewVarEnvDef_Click);
             // 
@@ -152,7 +158,7 @@ namespace MscrmTools.EnvironmentVariableManager
             this.tsbDelete.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.delete;
             this.tsbDelete.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbDelete.Name = "tsbDelete";
-            this.tsbDelete.Size = new System.Drawing.Size(98, 36);
+            this.tsbDelete.Size = new System.Drawing.Size(89, 36);
             this.tsbDelete.Text = "Delete";
             this.tsbDelete.ToolTipText = "Delete";
             this.tsbDelete.Click += new System.EventHandler(this.tsbDelete_Click);
@@ -160,14 +166,14 @@ namespace MscrmTools.EnvironmentVariableManager
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 41);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 39);
             // 
             // tsbExportExcel
             // 
             this.tsbExportExcel.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.export;
             this.tsbExportExcel.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbExportExcel.Name = "tsbExportExcel";
-            this.tsbExportExcel.Size = new System.Drawing.Size(99, 36);
+            this.tsbExportExcel.Size = new System.Drawing.Size(88, 36);
             this.tsbExportExcel.Text = "Export";
             this.tsbExportExcel.Click += new System.EventHandler(this.tsbExportExcel_Click);
             // 
@@ -176,7 +182,7 @@ namespace MscrmTools.EnvironmentVariableManager
             this.tsbImportFromExcel.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.import;
             this.tsbImportFromExcel.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.tsbImportFromExcel.Name = "tsbImportFromExcel";
-            this.tsbImportFromExcel.Size = new System.Drawing.Size(103, 36);
+            this.tsbImportFromExcel.Size = new System.Drawing.Size(90, 36);
             this.tsbImportFromExcel.Text = "Import";
             this.tsbImportFromExcel.Click += new System.EventHandler(this.tsbImportFromExcel_Click);
             // 
@@ -193,13 +199,15 @@ namespace MscrmTools.EnvironmentVariableManager
             this.Id2,
             this.TypeInt,
             this.Type});
+            this.dataGridView1.ContextMenuStrip = this.cmsEnvs;
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridView1.Location = new System.Drawing.Point(0, 0);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersWidth = 62;
             this.dataGridView1.RowTemplate.Height = 28;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(888, 750);
+            this.dataGridView1.Size = new System.Drawing.Size(1032, 1055);
             this.dataGridView1.TabIndex = 5;
             this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
             this.dataGridView1.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_RowEnter);
@@ -276,8 +284,10 @@ namespace MscrmTools.EnvironmentVariableManager
             this.gbEnvVariable.Dock = System.Windows.Forms.DockStyle.Fill;
             this.gbEnvVariable.FlatStyle = System.Windows.Forms.FlatStyle.System;
             this.gbEnvVariable.Location = new System.Drawing.Point(0, 0);
+            this.gbEnvVariable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.gbEnvVariable.Name = "gbEnvVariable";
-            this.gbEnvVariable.Size = new System.Drawing.Size(460, 750);
+            this.gbEnvVariable.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.gbEnvVariable.Size = new System.Drawing.Size(536, 1055);
             this.gbEnvVariable.TabIndex = 6;
             this.gbEnvVariable.TabStop = false;
             this.gbEnvVariable.Text = "New environment variable ";
@@ -285,9 +295,10 @@ namespace MscrmTools.EnvironmentVariableManager
             // btnValidateEnv
             // 
             this.btnValidateEnv.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnValidateEnv.Location = new System.Drawing.Point(3, 483);
+            this.btnValidateEnv.Location = new System.Drawing.Point(3, 391);
+            this.btnValidateEnv.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.btnValidateEnv.Name = "btnValidateEnv";
-            this.btnValidateEnv.Size = new System.Drawing.Size(454, 55);
+            this.btnValidateEnv.Size = new System.Drawing.Size(530, 44);
             this.btnValidateEnv.TabIndex = 10;
             this.btnValidateEnv.Text = "Save";
             this.btnValidateEnv.UseVisualStyleBackColor = true;
@@ -296,18 +307,19 @@ namespace MscrmTools.EnvironmentVariableManager
             // txtDefaultValue
             // 
             this.txtDefaultValue.Dock = System.Windows.Forms.DockStyle.Top;
-            this.txtDefaultValue.Location = new System.Drawing.Point(3, 381);
+            this.txtDefaultValue.Location = new System.Drawing.Point(3, 309);
+            this.txtDefaultValue.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtDefaultValue.Multiline = true;
             this.txtDefaultValue.Name = "txtDefaultValue";
-            this.txtDefaultValue.Size = new System.Drawing.Size(454, 102);
+            this.txtDefaultValue.Size = new System.Drawing.Size(530, 82);
             this.txtDefaultValue.TabIndex = 9;
             // 
             // lblDefautValue
             // 
             this.lblDefautValue.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblDefautValue.Location = new System.Drawing.Point(3, 346);
+            this.lblDefautValue.Location = new System.Drawing.Point(3, 281);
             this.lblDefautValue.Name = "lblDefautValue";
-            this.lblDefautValue.Size = new System.Drawing.Size(454, 35);
+            this.lblDefautValue.Size = new System.Drawing.Size(530, 28);
             this.lblDefautValue.TabIndex = 8;
             this.lblDefautValue.Text = "Default value";
             this.lblDefautValue.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -324,17 +336,18 @@ namespace MscrmTools.EnvironmentVariableManager
             "JSON",
             "Connection reference",
             "Secret"});
-            this.cbbType.Location = new System.Drawing.Point(3, 318);
+            this.cbbType.Location = new System.Drawing.Point(3, 257);
+            this.cbbType.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.cbbType.Name = "cbbType";
-            this.cbbType.Size = new System.Drawing.Size(454, 28);
+            this.cbbType.Size = new System.Drawing.Size(530, 24);
             this.cbbType.TabIndex = 7;
             // 
             // lblType
             // 
             this.lblType.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblType.Location = new System.Drawing.Point(3, 281);
+            this.lblType.Location = new System.Drawing.Point(3, 227);
             this.lblType.Name = "lblType";
-            this.lblType.Size = new System.Drawing.Size(454, 37);
+            this.lblType.Size = new System.Drawing.Size(530, 30);
             this.lblType.TabIndex = 6;
             this.lblType.Text = "Type";
             this.lblType.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -342,18 +355,19 @@ namespace MscrmTools.EnvironmentVariableManager
             // txtDescription
             // 
             this.txtDescription.Dock = System.Windows.Forms.DockStyle.Top;
-            this.txtDescription.Location = new System.Drawing.Point(3, 179);
+            this.txtDescription.Location = new System.Drawing.Point(3, 145);
+            this.txtDescription.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtDescription.Multiline = true;
             this.txtDescription.Name = "txtDescription";
-            this.txtDescription.Size = new System.Drawing.Size(454, 102);
+            this.txtDescription.Size = new System.Drawing.Size(530, 82);
             this.txtDescription.TabIndex = 5;
             // 
             // lblDescription
             // 
             this.lblDescription.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblDescription.Location = new System.Drawing.Point(3, 144);
+            this.lblDescription.Location = new System.Drawing.Point(3, 117);
             this.lblDescription.Name = "lblDescription";
-            this.lblDescription.Size = new System.Drawing.Size(454, 35);
+            this.lblDescription.Size = new System.Drawing.Size(530, 28);
             this.lblDescription.TabIndex = 4;
             this.lblDescription.Text = "Description";
             this.lblDescription.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -361,17 +375,18 @@ namespace MscrmTools.EnvironmentVariableManager
             // txtUniqueName
             // 
             this.txtUniqueName.Dock = System.Windows.Forms.DockStyle.Top;
-            this.txtUniqueName.Location = new System.Drawing.Point(3, 118);
+            this.txtUniqueName.Location = new System.Drawing.Point(3, 95);
+            this.txtUniqueName.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtUniqueName.Name = "txtUniqueName";
-            this.txtUniqueName.Size = new System.Drawing.Size(454, 26);
+            this.txtUniqueName.Size = new System.Drawing.Size(530, 22);
             this.txtUniqueName.TabIndex = 3;
             // 
             // lblUniqueName
             // 
             this.lblUniqueName.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblUniqueName.Location = new System.Drawing.Point(3, 83);
+            this.lblUniqueName.Location = new System.Drawing.Point(3, 67);
             this.lblUniqueName.Name = "lblUniqueName";
-            this.lblUniqueName.Size = new System.Drawing.Size(454, 35);
+            this.lblUniqueName.Size = new System.Drawing.Size(530, 28);
             this.lblUniqueName.TabIndex = 2;
             this.lblUniqueName.Text = "Unique name";
             this.lblUniqueName.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -379,17 +394,18 @@ namespace MscrmTools.EnvironmentVariableManager
             // txtDisplayName
             // 
             this.txtDisplayName.Dock = System.Windows.Forms.DockStyle.Top;
-            this.txtDisplayName.Location = new System.Drawing.Point(3, 57);
+            this.txtDisplayName.Location = new System.Drawing.Point(3, 45);
+            this.txtDisplayName.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtDisplayName.Name = "txtDisplayName";
-            this.txtDisplayName.Size = new System.Drawing.Size(454, 26);
+            this.txtDisplayName.Size = new System.Drawing.Size(530, 22);
             this.txtDisplayName.TabIndex = 1;
             // 
             // lblDisplayName
             // 
             this.lblDisplayName.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblDisplayName.Location = new System.Drawing.Point(3, 22);
+            this.lblDisplayName.Location = new System.Drawing.Point(3, 17);
             this.lblDisplayName.Name = "lblDisplayName";
-            this.lblDisplayName.Size = new System.Drawing.Size(454, 35);
+            this.lblDisplayName.Size = new System.Drawing.Size(530, 28);
             this.lblDisplayName.TabIndex = 0;
             this.lblDisplayName.Text = "Display name";
             this.lblDisplayName.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
@@ -397,7 +413,8 @@ namespace MscrmTools.EnvironmentVariableManager
             // scMain
             // 
             this.scMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.scMain.Location = new System.Drawing.Point(0, 41);
+            this.scMain.Location = new System.Drawing.Point(0, 39);
+            this.scMain.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.scMain.Name = "scMain";
             // 
             // scMain.Panel1
@@ -407,30 +424,60 @@ namespace MscrmTools.EnvironmentVariableManager
             // scMain.Panel2
             // 
             this.scMain.Panel2.Controls.Add(this.gbEnvVariable);
-            this.scMain.Size = new System.Drawing.Size(1352, 750);
-            this.scMain.SplitterDistance = 888;
+            this.scMain.Size = new System.Drawing.Size(1572, 1055);
+            this.scMain.SplitterDistance = 1032;
             this.scMain.TabIndex = 7;
             // 
             // excelImportDialog1
             // 
             this.excelImportDialog1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.excelImportDialog1.Location = new System.Drawing.Point(-7, 70);
+            this.excelImportDialog1.Location = new System.Drawing.Point(-6, 56);
+            this.excelImportDialog1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.excelImportDialog1.Name = "excelImportDialog1";
-            this.excelImportDialog1.Size = new System.Drawing.Size(1414, 71);
+            this.excelImportDialog1.Size = new System.Drawing.Size(1257, 57);
             this.excelImportDialog1.TabIndex = 8;
             this.excelImportDialog1.Variables = null;
             this.excelImportDialog1.Visible = false;
             // 
+            // cmsEnvs
+            // 
+            this.cmsEnvs.ImageScalingSize = new System.Drawing.Size(20, 20);
+            this.cmsEnvs.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsmiCopyName,
+            this.tsmiCopySchemaName,
+            this.tsmiCopyValue});
+            this.cmsEnvs.Name = "cmsEnvs";
+            this.cmsEnvs.Size = new System.Drawing.Size(213, 104);
+            this.cmsEnvs.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.cmsEnvs_ItemClicked);
+            // 
+            // tsmiCopySchemaName
+            // 
+            this.tsmiCopySchemaName.Name = "tsmiCopySchemaName";
+            this.tsmiCopySchemaName.Size = new System.Drawing.Size(212, 24);
+            this.tsmiCopySchemaName.Text = "Copy Schema Name";
+            // 
+            // tsmiCopyName
+            // 
+            this.tsmiCopyName.Name = "tsmiCopyName";
+            this.tsmiCopyName.Size = new System.Drawing.Size(212, 24);
+            this.tsmiCopyName.Text = "Copy name";
+            // 
+            // tsmiCopyValue
+            // 
+            this.tsmiCopyValue.Name = "tsmiCopyValue";
+            this.tsmiCopyValue.Size = new System.Drawing.Size(212, 24);
+            this.tsmiCopyValue.Text = "Copy value";
+            // 
             // EvmControl
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.excelImportDialog1);
             this.Controls.Add(this.scMain);
             this.Controls.Add(this.toolStripMenu);
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
             this.Name = "EvmControl";
-            this.Size = new System.Drawing.Size(1352, 791);
+            this.Size = new System.Drawing.Size(1572, 1094);
             this.Resize += new System.EventHandler(this.EvmControl_Resize);
             this.toolStripMenu.ResumeLayout(false);
             this.toolStripMenu.PerformLayout();
@@ -441,6 +488,7 @@ namespace MscrmTools.EnvironmentVariableManager
             this.scMain.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.scMain)).EndInit();
             this.scMain.ResumeLayout(false);
+            this.cmsEnvs.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -481,5 +529,9 @@ namespace MscrmTools.EnvironmentVariableManager
         private System.Windows.Forms.DataGridViewTextBoxColumn Id2;
         private System.Windows.Forms.DataGridViewTextBoxColumn TypeInt;
         private System.Windows.Forms.DataGridViewTextBoxColumn Type;
+        private System.Windows.Forms.ContextMenuStrip cmsEnvs;
+        private System.Windows.Forms.ToolStripMenuItem tsmiCopyName;
+        private System.Windows.Forms.ToolStripMenuItem tsmiCopySchemaName;
+        private System.Windows.Forms.ToolStripMenuItem tsmiCopyValue;
     }
 }

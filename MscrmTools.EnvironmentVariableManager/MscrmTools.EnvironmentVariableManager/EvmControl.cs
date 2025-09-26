@@ -158,6 +158,27 @@ namespace MscrmTools.EnvironmentVariableManager
             });
         }
 
+        private void cmsEnvs_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            if (dataGridView1.SelectedRows.Count == 0) return;
+
+            var selectedItem = dataGridView1.SelectedRows[0];
+
+            if (e.ClickedItem == tsmiCopyName)
+            {
+                Clipboard.SetText(selectedItem.Cells[0].Value.ToString());
+            }
+            else if (e.ClickedItem == tsmiCopySchemaName)
+            {
+                Clipboard.SetText(selectedItem.Cells[1].Value.ToString());
+            }
+            else if (e.ClickedItem == tsmiCopyValue)
+            {
+                if(selectedItem.Cells[2] != null && !string.IsNullOrEmpty(selectedItem.Cells[2].Value?.ToString()))
+                Clipboard.SetText(selectedItem.Cells[2].Value.ToString() ?? "");
+            }
+        }
+
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.ColumnIndex == 2)
