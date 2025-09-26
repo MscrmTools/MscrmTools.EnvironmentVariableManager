@@ -200,6 +200,26 @@ The solution involved are the following:
                 }
         }
 
+        private void cmsEnvs_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
+        {
+            if (dataGridView1.SelectedRows.Count < 1) return;
+
+            var row = dataGridView1.SelectedRows[0];
+
+            if (e.ClickedItem == tsmiCopyName)
+            {
+                Clipboard.SetText(row.Cells[0].Value?.ToString() ?? "");
+            }
+            else if (e.ClickedItem == tsmiCopySchemaName)
+            {
+                Clipboard.SetText(row.Cells[1].Value?.ToString() ?? "");
+            }
+            else if (e.ClickedItem == tsmiCopyValue)
+            {
+                Clipboard.SetText(row.Cells[2].Value?.ToString() ?? "");
+            }
+        }
+
         private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             if (e.ColumnIndex == 2)
