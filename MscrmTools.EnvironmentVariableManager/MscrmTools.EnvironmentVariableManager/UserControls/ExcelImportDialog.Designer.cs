@@ -40,6 +40,10 @@
             this.btnCancel = new System.Windows.Forms.Button();
             this.pnlMain = new System.Windows.Forms.Panel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.pnlNoChange = new System.Windows.Forms.Panel();
+            this.pnlNoChangeNotif = new System.Windows.Forms.Panel();
+            this.lblNoChange = new System.Windows.Forms.Label();
+            this.pbNoChange = new System.Windows.Forms.PictureBox();
             this.pnlMainSheet = new System.Windows.Forms.Panel();
             this.cbbSheets = new System.Windows.Forms.ComboBox();
             this.lblSheet = new System.Windows.Forms.Label();
@@ -53,6 +57,9 @@
             this.pnlBottom.SuspendLayout();
             this.pnlMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
+            this.pnlNoChange.SuspendLayout();
+            this.pnlNoChangeNotif.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pbNoChange)).BeginInit();
             this.pnlMainSheet.SuspendLayout();
             this.pnlMainFile.SuspendLayout();
             this.SuspendLayout();
@@ -140,6 +147,7 @@
             // pnlMain
             // 
             this.pnlMain.Controls.Add(this.dataGridView1);
+            this.pnlMain.Controls.Add(this.pnlNoChange);
             this.pnlMain.Controls.Add(this.pnlMainSheet);
             this.pnlMain.Controls.Add(this.pnlMainFile);
             this.pnlMain.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -163,7 +171,7 @@
             dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView1.Location = new System.Drawing.Point(0, 92);
+            this.dataGridView1.Location = new System.Drawing.Point(0, 146);
             this.dataGridView1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.ReadOnly = true;
@@ -171,8 +179,53 @@
             this.dataGridView1.RowHeadersWidth = 62;
             this.dataGridView1.RowTemplate.Height = 28;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(1707, 622);
+            this.dataGridView1.Size = new System.Drawing.Size(1707, 568);
             this.dataGridView1.TabIndex = 2;
+            // 
+            // pnlNoChange
+            // 
+            this.pnlNoChange.AutoScroll = true;
+            this.pnlNoChange.Controls.Add(this.pnlNoChangeNotif);
+            this.pnlNoChange.Dock = System.Windows.Forms.DockStyle.Top;
+            this.pnlNoChange.Location = new System.Drawing.Point(0, 92);
+            this.pnlNoChange.Name = "pnlNoChange";
+            this.pnlNoChange.Padding = new System.Windows.Forms.Padding(10);
+            this.pnlNoChange.Size = new System.Drawing.Size(1707, 54);
+            this.pnlNoChange.TabIndex = 3;
+            this.pnlNoChange.Visible = false;
+            // 
+            // pnlNoChangeNotif
+            // 
+            this.pnlNoChangeNotif.BackColor = System.Drawing.SystemColors.Info;
+            this.pnlNoChangeNotif.Controls.Add(this.lblNoChange);
+            this.pnlNoChangeNotif.Controls.Add(this.pbNoChange);
+            this.pnlNoChangeNotif.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pnlNoChangeNotif.Location = new System.Drawing.Point(10, 10);
+            this.pnlNoChangeNotif.Name = "pnlNoChangeNotif";
+            this.pnlNoChangeNotif.Size = new System.Drawing.Size(1687, 34);
+            this.pnlNoChangeNotif.TabIndex = 0;
+            // 
+            // lblNoChange
+            // 
+            this.lblNoChange.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lblNoChange.Location = new System.Drawing.Point(40, 0);
+            this.lblNoChange.Name = "lblNoChange";
+            this.lblNoChange.Size = new System.Drawing.Size(1647, 34);
+            this.lblNoChange.TabIndex = 1;
+            this.lblNoChange.Text = "No change have been found between the Excel file and the environment variables";
+            this.lblNoChange.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // pbNoChange
+            // 
+            this.pbNoChange.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.pbNoChange.Dock = System.Windows.Forms.DockStyle.Left;
+            this.pbNoChange.Image = global::MscrmTools.EnvironmentVariableManager.Properties.Resources.info;
+            this.pbNoChange.Location = new System.Drawing.Point(0, 0);
+            this.pbNoChange.Name = "pbNoChange";
+            this.pbNoChange.Size = new System.Drawing.Size(40, 34);
+            this.pbNoChange.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
+            this.pbNoChange.TabIndex = 0;
+            this.pbNoChange.TabStop = false;
             // 
             // pnlMainSheet
             // 
@@ -286,6 +339,9 @@
             this.pnlBottom.ResumeLayout(false);
             this.pnlMain.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
+            this.pnlNoChange.ResumeLayout(false);
+            this.pnlNoChangeNotif.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.pbNoChange)).EndInit();
             this.pnlMainSheet.ResumeLayout(false);
             this.pnlMainFile.ResumeLayout(false);
             this.pnlMainFile.PerformLayout();
@@ -313,5 +369,9 @@
         private System.Windows.Forms.Button btnCancel;
         private System.Windows.Forms.Label lblSolution;
         private System.Windows.Forms.ComboBox cbbSolutions;
+        private System.Windows.Forms.Panel pnlNoChange;
+        private System.Windows.Forms.Panel pnlNoChangeNotif;
+        private System.Windows.Forms.PictureBox pbNoChange;
+        private System.Windows.Forms.Label lblNoChange;
     }
 }

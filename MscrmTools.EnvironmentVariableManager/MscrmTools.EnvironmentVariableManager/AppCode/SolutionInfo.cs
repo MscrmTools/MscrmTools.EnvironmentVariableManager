@@ -16,6 +16,7 @@ namespace MscrmTools.EnvironmentVariableManager.AppCode
             _record = record;
         }
 
+        public Entity Entity => _record;
         public string UniqueName => _record.GetAttributeValue<string>("uniquename");
 
         public override string ToString()

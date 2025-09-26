@@ -9,10 +9,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
+using WeifenLuo.WinFormsUI.Docking;
 using XrmToolBox.Extensibility;
 using XrmToolBox.Extensibility.Interfaces;
 
@@ -22,12 +22,17 @@ namespace MscrmTools.EnvironmentVariableManager
     {
         private readonly List<int> _rowsIndexChanged = new List<int>();
         private Guid currentDefinitionId;
-
+        private EnvVarsForm evf;
         private Thread searchThread;
+        private List<Entity> solutions;
 
         public EvmControl()
         {
             InitializeComponent();
+
+            SetTheme();
+
+            evf = new EnvVarsForm();
         }
 
         /// <summary>
@@ -39,320 +44,23 @@ namespace MscrmTools.EnvironmentVariableManager
 
             if (newService != null)
             {
+                evf.Service = newService;
+                evf.Show(dpMain, WeifenLuo.WinFormsUI.Docking.DockState.Document);
+
                 LoadVariables();
                 LoadSolutions();
             }
         }
 
-        private void btnValidateEnv_Click(object sender, EventArgs e)
+        private void Evf_OnVariableSelected(object sender, EnvironmentVariableEventArgs e)
         {
-            var def = new Entity("environmentvariabledefinition")
-            {
-                Attributes =
-                {
-                    {"schemaname",txtUniqueName.Text},
-                    {"displayname", txtDisplayName.Text},
-                    {"description", txtDescription.Text},
-                    {"defaultvalue", txtDefaultValue.Text},
-                }
-            };
+            var existingContent = dpMain.Contents.OfType<VariableForm>().FirstOrDefault();
+            if (existingContent != null) existingContent.Close();
 
-            if (currentDefinitionId != Guid.Empty)
-            {
-                def.Id = currentDefinitionId;
-            }
-
-            switch (cbbType.SelectedItem?.ToString())
-            {
-                case "String":
-                    def["type"] = new OptionSetValue(100000000);
-                    break;
-
-                case "Number":
-                    def["type"] = new OptionSetValue(100000001);
-                    break;
-
-                case "Boolean":
-                    def["type"] = new OptionSetValue(100000002);
-                    break;
-
-                case "JSON":
-                    def["type"] = new OptionSetValue(100000003);
-                    break;
-
-                case "Connection reference":
-                    def["type"] = new OptionSetValue(100000004);
-                    break;
-
-                case "Secret":
-                    def["type"] = new OptionSetValue(100000005);
-                    break;
-
-                default:
-                    MessageBox.Show(this, @"Please select a type for the environment variable", @"Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-            }
-
-            WorkAsync(new WorkAsyncInfo
-            {
-                Message = $"{(def.Id == Guid.Empty ? "Creating" : "Updating")} environment variable definition {def.GetAttributeValue<string>("schema name")}",
-                Work = (bw, evt) =>
-                {
-                    if (def.Id == Guid.Empty)
-                    {
-                        def.Id = Service.Create(def);
-                    }
-                    else
-                    {
-                        Service.Update(def);
-                    }
-                },
-                PostWorkCallBack = evt =>
-                {
-                    if (evt.Error != null)
-                    {
-                        MessageBox.Show(this, $@"An error occured when processing environment variable definition: {evt.Error.Message}", @"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-
-                    if (currentDefinitionId == Guid.Empty)
-                    {
-                        if (MessageBox.Show(this, $@"Do you want to add variable {def.GetAttributeValue<string>("schema name")} in a solution?", @"Question",
-                       MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.No)
-                        {
-                            scMain.Panel2Collapsed = true;
-                            LoadVariables();
-                            return;
-                        }
-
-                        var dialog = new SolutionPicker(Service);
-                        if (dialog.ShowDialog(this) == DialogResult.OK)
-                        {
-                            WorkAsync(new WorkAsyncInfo
-                            {
-                                Message = $"Adding environment variable definition {def.GetAttributeValue<string>("schema name")} to solution {dialog.SelectedSolution.GetAttributeValue<string>("friendlyname")}",
-                                Work = (bw, evt2) =>
-                                {
-                                    Service.Execute(new AddSolutionComponentRequest
-                                    {
-                                        ComponentId = def.Id,
-                                        ComponentType = 380,
-                                        SolutionUniqueName = dialog.SelectedSolution.GetAttributeValue<string>("uniquename")
-                                    });
-                                },
-                                PostWorkCallBack = evt2 =>
-                                {
-                                    if (evt.Error != null)
-                                    {
-                                        MessageBox.Show(this, $@"An error occured when adding environment variable to the solution: {evt.Error.Message}", @"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                                        return;
-                                    }
-
-                                    scMain.Panel2Collapsed = true;
-                                    LoadVariables();
-                                }
-                            });
-                        }
-                    }
-                }
-            });
-        }
-
-        private void cmsEnvs_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-            if (dataGridView1.SelectedRows.Count == 0) return;
-
-            var selectedItem = dataGridView1.SelectedRows[0];
-
-            if (e.ClickedItem == tsmiCopyName)
-            {
-                Clipboard.SetText(selectedItem.Cells[0].Value.ToString());
-            }
-            else if (e.ClickedItem == tsmiCopySchemaName)
-            {
-                Clipboard.SetText(selectedItem.Cells[1].Value.ToString());
-            }
-            else if (e.ClickedItem == tsmiCopyValue)
-            {
-                if(selectedItem.Cells[2] != null && !string.IsNullOrEmpty(selectedItem.Cells[2].Value?.ToString()))
-                Clipboard.SetText(selectedItem.Cells[2].Value.ToString() ?? "");
-            }
-        }
-
-        private void dataGridView1_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.ColumnIndex == 2)
-            {
-                var row = dataGridView1.Rows[e.RowIndex];
-                if (row.Cells[5].Value.ToString() == "Secret")
-                {
-                    var dialog = new SecretForm(row.Cells[2].Value?.ToString() ?? "");
-                    if (dialog.ShowDialog(this) == DialogResult.OK)
-                    {
-                        row.Cells[2].Value = dialog.SecretPath;
-                    }
-                }
-                else if (row.Cells[5].Value.ToString() == "JSON")
-                {
-                    var dialog = new JsonForm(row.Cells[2].Value?.ToString() ?? "");
-                    if (dialog.ShowDialog(this) == DialogResult.OK)
-                    {
-                        row.Cells[2].Value = dialog.Json;
-                    }
-                }
-            }
-        }
-
-        private void DataGridView1_CellValueChanged(object sender, DataGridViewCellEventArgs e)
-        {
-            if (e.ColumnIndex != 2 || _rowsIndexChanged.Contains(e.RowIndex)) return;
-
-            var changedCell = dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex];
-            var type = int.Parse(dataGridView1.Rows[e.RowIndex].Cells[6].Value.ToString());
-            if (type == 100000001)
-            {
-                if (!decimal.TryParse(changedCell.Value.ToString(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture.NumberFormat, out decimal _))
-                {
-                    MessageBox.Show(this,
-                        @"Provided value does not fit with data type Decimal.
-
-Please correct the value", @"Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-            }
-            else if (type == 100000002)
-            {
-                if (!Validator.ValidateBoolean(changedCell.Value.ToString()))
-                {
-                    MessageBox.Show(this,
-                        @"Provided value does not fit with data type Boolean.
-
-Please correct the value: yes or no", @"Error",
-                        MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-            }
-
-            _rowsIndexChanged.Add(e.RowIndex);
-
-            foreach (DataGridViewCell cell in dataGridView1.Rows[e.RowIndex].Cells)
-            {
-                cell.Style.BackColor = Color.Yellow;
-            }
-        }
-
-        private void dataGridView1_RowEnter(object sender, DataGridViewCellEventArgs e)
-        {
-            var row = dataGridView1.Rows[e.RowIndex];
-            var id = new Guid(row.Cells[3].Value?.ToString() ?? Guid.Empty.ToString());
-            var defId = new Guid(row.Cells[4].Value?.ToString() ?? Guid.Empty.ToString());
-            currentDefinitionId = defId;
-
-            if (id != Guid.Empty)
-            {
-                var variable = Service.RetrieveMultiple(new QueryExpression("environmentvariablevalue")
-                {
-                    NoLock = true,
-                    ColumnSet = new ColumnSet(true),
-                    Criteria = new FilterExpression
-                    {
-                        Conditions =
-                       {
-                           new ConditionExpression("environmentvariablevalueid", ConditionOperator.Equal, id)
-                       }
-                    },
-                    LinkEntities =
-                    {
-                        new LinkEntity
-                        {
-                            LinkFromEntityName = "environmentvariablevalue",
-                            LinkFromAttributeName = "environmentvariabledefinitionid",
-                            LinkToAttributeName = "environmentvariabledefinitionid",
-                            LinkToEntityName = "environmentvariabledefinition",
-                            Columns = new ColumnSet("displayname","schemaname","description","defaultvalue", "type"),
-                            EntityAlias = "def"
-                        }
-                    }
-                }).Entities.First();
-
-                txtDisplayName.Text = variable.GetAttributeValue<AliasedValue>("def.displayname")?.Value.ToString();
-                txtUniqueName.Text = variable.GetAttributeValue<AliasedValue>("def.schemaname")?.Value.ToString();
-                txtDescription.Text = variable.GetAttributeValue<AliasedValue>("def.description")?.Value.ToString();
-                txtDefaultValue.Text = variable.GetAttributeValue<AliasedValue>("def.defaultvalue")?.Value.ToString();
-                cbbType.SelectedItem = variable.FormattedValues["def.type"];
-                scMain.Panel2Collapsed = false;
-            }
-            else
-            {
-                var def = Service.RetrieveMultiple(new QueryExpression("environmentvariabledefinition")
-                {
-                    NoLock = true,
-                    ColumnSet = new ColumnSet("displayname", "schemaname", "description", "defaultvalue", "type"),
-                    Criteria = new FilterExpression
-                    {
-                        Conditions =
-                       {
-                           new ConditionExpression("environmentvariabledefinitionid", ConditionOperator.Equal, defId)
-                       }
-                    }
-                }).Entities.FirstOrDefault();
-
-                if (def != null)
-                {
-                    txtDisplayName.Text = def.GetAttributeValue<string>("displayname");
-                    txtUniqueName.Text = def.GetAttributeValue<string>("schemaname");
-                    txtDescription.Text = def.GetAttributeValue<string>("description");
-                    txtDefaultValue.Text = def.GetAttributeValue<string>("defaultvalue");
-                    cbbType.SelectedItem = def.FormattedValues["type"];
-                    scMain.Panel2Collapsed = false;
-                }
-            }
-
-            txtUniqueName.Enabled = false;
-            cbbType.Enabled = false;
-            gbEnvVariable.Text = "Environment Variable definition";
-        }
-
-        private void DisplayRows(object filter = null)
-        {
-            if (InvokeRequired)
-            {
-                Invoke(new Action(() =>
-                {
-                    foreach (DataGridViewRow row in dataGridView1.Rows)
-                    {
-                        if (filter == null)
-                        {
-                            row.Visible = true;
-                            continue;
-                        }
-
-                        var isVisible = row.Cells[0].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0
-                                     || row.Cells[1].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0
-                                     || row.Cells[2].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0;
-
-                        row.Visible = isVisible;
-                    }
-                }));
-
-                return;
-            }
-
-            foreach (DataGridViewRow row in dataGridView1.Rows)
-            {
-                if (filter == null)
-                {
-                    row.Visible = true;
-                    continue;
-                }
-
-                var isVisible = row.Cells[0].Value != null && row.Cells[0].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0
-                             || row.Cells[1].Value != null && row.Cells[1].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0
-                             || row.Cells[2].Value != null && row.Cells[2].Value.ToString().ToLower().IndexOf(filter.ToString(), StringComparison.InvariantCultureIgnoreCase) >= 0;
-
-                row.Visible = isVisible;
-            }
+            var variableForm = new VariableForm(solutions);
+            variableForm.DisplayEnvironmentVariable(e.Definition);
+            variableForm.OnVariableActionRequested += VariableForm_OnVariableActionRequested;
+            variableForm.Show(dpMain, DockState.DockRight);
         }
 
         private void EvmControl_Resize(object sender, EventArgs e)
@@ -515,125 +223,66 @@ Please correct the value: yes or no", @"Error",
             qe.Criteria.AddCondition(new ConditionExpression("isvisible", ConditionOperator.Equal, true));
             qe.Criteria.AddCondition(new ConditionExpression("uniquename", ConditionOperator.NotEqual, "Default"));
 
-            excelImportDialog1.Solutions = Service.RetrieveMultiple(qe).Entities.ToList();
+            solutions = Service.RetrieveMultiple(qe).Entities.ToList();
+            excelImportDialog1.Solutions = solutions;
         }
 
         private void LoadVariables()
         {
-            var variables = Service.RetrieveMultiple(new QueryExpression("environmentvariabledefinition")
+            evf.OnVariableSelected -= Evf_OnVariableSelected;
+
+            var existingContent = dpMain.Contents.OfType<VariableForm>().FirstOrDefault();
+            if (existingContent != null) existingContent.Close();
+
+            WorkAsync(new WorkAsyncInfo
             {
-                NoLock = true,
-                ColumnSet = new ColumnSet("displayname", "schemaname", "type"),
-                LinkEntities =
+                Message = "Loading environment variables...",
+                Work = (bw, evt) =>
                 {
-                    new LinkEntity
-                    {
-                        JoinOperator = JoinOperator.LeftOuter,
-                        LinkFromEntityName = "environmentvariabledefinition",
-                        LinkFromAttributeName = "environmentvariabledefinitionid",
-                        LinkToAttributeName = "environmentvariabledefinitionid",
-                        LinkToEntityName = "environmentvariablevalue",
-                        Columns = new ColumnSet("value","environmentvariablevalueid"),
-                        EntityAlias = "val",
-                        LinkEntities =
-                        {
-                            new LinkEntity
-                            {
-                                JoinOperator = JoinOperator.LeftOuter,
-                                LinkFromEntityName = "environmentvariablevalue",
-                                LinkFromAttributeName = "environmentvariablevalueid",
-                                LinkToAttributeName = "objectid",
-                                LinkToEntityName = "solutioncomponent",
-                                Columns = new ColumnSet("solutioncomponentid"),
-                                EntityAlias = "solutionComponent",
-                                LinkEntities =
-                                {
-                                    new LinkEntity
-                                    {
-                                        JoinOperator = JoinOperator.LeftOuter,
-                                        LinkFromEntityName = "solutioncomponent",
-                                        LinkFromAttributeName = "solutionid",
-                                        LinkToAttributeName = "solutionid",
-                                        LinkToEntityName = "solution",
-                                        Columns = new ColumnSet("friendlyname","uniquename"),
-                                          LinkCriteria = new FilterExpression
-                                          {
-                                              Conditions =
-                                              {
-                                                  new ConditionExpression("uniquename", ConditionOperator.NotEqual, "Default"),
-                                                  new ConditionExpression("uniquename", ConditionOperator.NotEqual, "Active"),
-                                                  new ConditionExpression("ismanaged", ConditionOperator.Equal, true),
-                                              }
-                                          }
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    evf.LoadVariables();
                 },
-                Orders = { new OrderExpression("displayname", OrderType.Ascending) }
-            });
-
-            dataGridView1.Rows.Clear();
-
-            foreach (var variableGroup in variables.Entities.GroupBy(g => g.GetAttributeValue<string>("schemaname")))
-            {
-                var variable = variableGroup.First();
-                var solutions = variableGroup.Where(vg => vg.GetAttributeValue<AliasedValue>("solution1.friendlyname") != null).ToList();
-                var solutionsList = "";
-
-                Guid id = Guid.Empty;
-                if (variable.GetAttributeValue<AliasedValue>("val.environmentvariablevalueid") != null)
+                PostWorkCallBack = evt =>
                 {
-                    id = (Guid)variable.GetAttributeValue<AliasedValue>("val.environmentvariablevalueid").Value;
-                }
-
-                string ttt = string.Empty;
-                if (solutions.Count > 0)
-                {
-                    solutionsList = string.Join("\n- ", solutions.Select(vg => vg.GetAttributeValue<AliasedValue>("solution1.friendlyname").Value.ToString()).ToList());
-
-                    ttt = $@"This environment variable value has been imported with a managed solution.
-
-Be careful! If you import the same solution(s) using Upgrade method and you overwrite unmanaged customization, this could lead to a removal of this environment variable value.
-
-The solution involved are the following:
-- {solutionsList}
-";
-                }
-
-                dataGridView1.Rows.Add(
-                    new DataGridViewRow
+                    if (evt.Error != null)
                     {
-                        Cells =
-                        {
-                            new TextAndImageCell{Value = variable.GetAttributeValue<string>("displayname"),DisplayWarningImage= solutions.Count > 0, ToolTipText = ttt},
-                            new DataGridViewTextBoxCell{Value = variable.GetAttributeValue<string>("schemaname")},
-                            new DataGridViewTextBoxCell{Value = variable.GetAttributeValue<AliasedValue>("val.value")?.Value?.ToString() ?? ""},
-                            new DataGridViewTextBoxCell{Value = id.ToString()},
-                            new DataGridViewTextBoxCell{Value = variable.Id.ToString()},
-                            new DataGridViewTextBoxCell{Value = variable.FormattedValues["type"]},
-                            new DataGridViewTextBoxCell{Value = variable.GetAttributeValue<OptionSetValue>("type").Value.ToString()}
-                        }
+                        MessageBox.Show(this, "An error occured when loading Environment Variables: " + evt.Error.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
                     }
-                );
-            }
 
-            DisplayRows(tstxtSearch.Text);
-
-            SetDatagridViewColumnsSettings();
-            dataGridView1.CellValueChanged += DataGridView1_CellValueChanged;
+                    evf.DisplayVariables();
+                    evf.OnVariableSelected += Evf_OnVariableSelected;
+                }
+            });
         }
 
-        private void SetDatagridViewColumnsSettings()
+        private void SetTheme()
         {
-            dataGridView1.Columns[0].Width = 200;
-            dataGridView1.Columns[1].Width = 200;
-            dataGridView1.Columns[2].Width = 600;
-            dataGridView1.Columns[3].Visible = false;
-            dataGridView1.Columns[4].Visible = false;
-            dataGridView1.Columns[5].Width = 100;
-            dataGridView1.Columns[6].Visible = false;
+            if (XrmToolBox.Options.Instance.Theme != null)
+            {
+                switch (XrmToolBox.Options.Instance.Theme)
+                {
+                    case "Blue theme":
+                        {
+                            var theme = new VS2015BlueTheme();
+                            dpMain.Theme = theme;
+                        }
+                        break;
+
+                    case "Light theme":
+                        {
+                            var theme = new VS2015LightTheme();
+                            dpMain.Theme = theme;
+                        }
+                        break;
+
+                    case "Dark theme":
+                        {
+                            var theme = new VS2015DarkTheme();
+                            dpMain.Theme = theme;
+                        }
+                        break;
+                }
+            }
         }
 
         private void toolStripMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -647,22 +296,18 @@ The solution involved are the following:
 
         private void tsbCreateNewVarEnvDef_Click(object sender, EventArgs e)
         {
-            txtDisplayName.Text = "";
-            txtUniqueName.Text = "";
-            txtDescription.Text = "";
-            txtDefaultValue.Text = "";
-            cbbType.SelectedIndex = -1;
+            var existingContent = dpMain.Contents.OfType<VariableForm>().FirstOrDefault();
+            if (existingContent != null) existingContent.Close();
 
-            scMain.Panel2Collapsed = false;
-            currentDefinitionId = Guid.Empty;
-            txtUniqueName.Enabled = true;
-            cbbType.Enabled = true;
-            gbEnvVariable.Text = "New Environment Variable definition";
+            var variableForm = new VariableForm(solutions);
+            variableForm.OnVariableActionRequested += VariableForm_OnVariableActionRequested;
+            variableForm.Show(dpMain, DockState.DockRight);
         }
 
         private void tsbDelete_Click(object sender, EventArgs e)
         {
-            var selectedRow = dataGridView1.SelectedRows[0];
+            var selectedRow = evf.SelectedRow;
+            if (selectedRow == null) return;
 
             var defId = new Guid(selectedRow.Cells[4].Value?.ToString() ?? Guid.Empty.ToString());
             if (defId == Guid.Empty)
@@ -699,7 +344,7 @@ The solution involved are the following:
 
         private void tsbExportExcel_Click(object sender, EventArgs e)
         {
-            using (var sfd = new SaveFileDialog { AddExtension = true, DefaultExt = "xlsx", Filter = "Excel files|*.xlsx", FileName = "EnvironmentVariables.xlsx" })
+            using (var sfd = new SaveFileDialog { AddExtension = true, DefaultExt = "xlsx", Filter = "Excel files|*.xlsx", FileName = "EnvironmentVariables.xlsx", Title = "You can use the same file to store values from different environments. One sheet will be created for each environment." })
             {
                 if (sfd.ShowDialog(this) == DialogResult.OK)
                 {
@@ -737,6 +382,7 @@ The solution involved are the following:
 
         private void tsbImportFromExcel_Click(object sender, EventArgs e)
         {
+            excelImportDialog1.BringToFront();
             excelImportDialog1.Visible = true;
             excelImportDialog1.Variables = GetVariables().Entities.ToList();
             excelImportDialog1.OnImportRequested -= ExcelImportDialog1_OnImportRequested;
@@ -745,7 +391,7 @@ The solution involved are the following:
 
         private void tsbUpdate_Click(object sender, EventArgs e)
         {
-            if (_rowsIndexChanged.Count == 0)
+            if (evf.ChangedRows.Count == 0)
             {
                 MessageBox.Show(this, @"No variable was changed", @"Warning", MessageBoxButtons.OK,
                     MessageBoxIcon.Warning);
@@ -758,15 +404,14 @@ The solution involved are the following:
 
             var list = new List<Tuple<Guid, Guid, string, string, int>>();
 
-            foreach (var index in _rowsIndexChanged)
+            foreach (var row in evf.ChangedRows)
             {
-                var row = dataGridView1.Rows[index];
                 var variable = row.Cells[0].Value.ToString();
                 var id = new Guid(row.Cells[3].Value?.ToString() ?? Guid.Empty.ToString());
                 var defId = new Guid(row.Cells[4].Value?.ToString() ?? Guid.Empty.ToString());
                 var value = row.Cells[2].Value.ToString();
 
-                list.Add(new Tuple<Guid, Guid, string, string, int>(id, defId, variable, value, index));
+                list.Add(new Tuple<Guid, Guid, string, string, int>(id, defId, variable, value, row.Index));
             }
 
             WorkAsync(new WorkAsyncInfo
@@ -810,12 +455,7 @@ The solution involved are the following:
                             {
                                 if (id != Guid.Empty)
                                 {
-                                    dataGridView1.Rows[item.Item5].Cells[3].Value = id.ToString();
-                                }
-
-                                foreach (DataGridViewCell cell in dataGridView1.Rows[item.Item5].Cells)
-                                {
-                                    cell.Style.BackColor = Color.Green;
+                                    evf.SetNewId(item.Item5, id);
                                 }
                             }));
                         }
@@ -837,17 +477,72 @@ The solution involved are the following:
                             MessageBoxIcon.Error);
                     }
 
-                    foreach (DataGridViewRow row in dataGridView1.Rows)
-
-                        foreach (DataGridViewCell cell in row.Cells)
-                        {
-                            if (cell.Style.BackColor == Color.Green)
-                                cell.Style.BackColor = Color.White;
-                        }
+                    evf.ClearSuccess();
                 },
                 ProgressChanged = evt =>
                 {
                     SetWorkingMessage(evt.UserState.ToString());
+                }
+            });
+        }
+
+        private void tstxtSearch_TextChanged(object sender, EventArgs e)
+        {
+            searchThread?.Abort();
+            searchThread = new Thread(evf.DisplayRows);
+            searchThread.Start(tstxtSearch.Text);
+        }
+
+        private void VariableForm_OnVariableActionRequested(object sender, EnvironmentVariableActionEventArgs e)
+        {
+            WorkAsync(new WorkAsyncInfo
+            {
+                Message = $"{(e.Definition.Id == Guid.Empty ? "Creating" : "Updating")} environment variable definition {e.Definition.GetAttributeValue<string>("schema name")}",
+                Work = (bw, evt) =>
+                {
+                    if (e.Definition.Id == Guid.Empty)
+                    {
+                        e.Definition.Id = Service.Create(e.Definition);
+                    }
+                    else
+                    {
+                        Service.Update(e.Definition);
+                    }
+                },
+                PostWorkCallBack = evt =>
+                {
+                    if (evt.Error != null)
+                    {
+                        MessageBox.Show(this, $@"An error occured when processing environment variable definition: {evt.Error.Message}", @"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    if (e.Solution != null)
+                    {
+                        WorkAsync(new WorkAsyncInfo
+                        {
+                            Message = $"Adding environment variable definition {e.Definition.GetAttributeValue<string>("schema name")} to solution {e.Solution.GetAttributeValue<string>("friendlyname")}",
+                            Work = (bw, evt2) =>
+                            {
+                                Service.Execute(new AddSolutionComponentRequest
+                                {
+                                    ComponentId = e.Definition.Id,
+                                    ComponentType = 380,
+                                    SolutionUniqueName = e.Solution.GetAttributeValue<string>("uniquename")
+                                });
+                            },
+                            PostWorkCallBack = evt2 =>
+                            {
+                                if (evt.Error != null)
+                                {
+                                    MessageBox.Show(this, $@"An error occured when adding environment variable to the solution: {evt.Error.Message}", @"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                    return;
+                                }
+
+                                LoadVariables();
+                            }
+                        });
+                    }
                 }
             });
         }
@@ -865,12 +560,5 @@ The solution involved are the following:
         public string EmailAccount => "tanguy92@hotmail.com";
 
         #endregion PayPal
-
-        private void tstxtSearch_TextChanged(object sender, EventArgs e)
-        {
-            searchThread?.Abort();
-            searchThread = new Thread(DisplayRows);
-            searchThread.Start(tstxtSearch.Text);
-        }
     }
 }

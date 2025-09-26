@@ -27,6 +27,10 @@ namespace MscrmTools.EnvironmentVariableManager.AppCode
 
         public void ExportToExcel(List<Entity> variables, string sheetName)
         {
+            if (package.Workbook.Worksheets[sheetName] != null)
+            {
+                package.Workbook.Worksheets.Delete(sheetName);
+            }
             var worksheet = package.Workbook.Worksheets.Add(sheetName);
 
             worksheet.Cells[1, 1].Value = "Display Name";

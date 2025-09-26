@@ -4,7 +4,6 @@ using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -59,10 +58,10 @@ namespace MscrmTools.EnvironmentVariableManager.UserControls
                                  {
                                      new KeyValuePair<string, object>("schemaname", row.Cells[1].Value.ToString()),
                                      new KeyValuePair<string, object>("displayname", row.Cells[0].Value.ToString()),
-                                     new KeyValuePair<string, object>("description", row.Cells[5].Value.ToString()),
+                                     new KeyValuePair<string, object>("description", row.Cells[5].Value?.ToString() ?? ""),
                                      new KeyValuePair<string, object>("type", row.Cells[4].Value.ToString()),
                                      new KeyValuePair<string, object>("value", row.Cells[3].Value.ToString()),
-                                      new KeyValuePair<string, object>("solutionuniquename", ((AppCode.SolutionInfo)cbbSolutions.SelectedItem)?.UniqueName)
+                                     new KeyValuePair<string, object>("solutionuniquename", ((AppCode.SolutionInfo)cbbSolutions.SelectedItem)?.UniqueName)
                                  }
                              }).ToList()
             });
@@ -124,13 +123,14 @@ namespace MscrmTools.EnvironmentVariableManager.UserControls
             }
 
             dataGridView1.DataSource = table;
-
+            bool hasChanges = false;
             foreach (DataGridViewRow row in dataGridView1.Rows)
             {
                 if (!(row.Cells[2].Value?.ToString() ?? "").Equals(row.Cells[3].Value?.ToString() ?? ""))
                 {
                     row.Cells[2].Style.BackColor = System.Drawing.Color.LightCoral;
                     row.Cells[3].Style.BackColor = System.Drawing.Color.LightGreen;
+                    hasChanges = true;
                 }
                 else
                 {
@@ -144,13 +144,9 @@ namespace MscrmTools.EnvironmentVariableManager.UserControls
             dataGridView1.Columns[0].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             dataGridView1.Columns[1].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
             dataGridView1.SelectionMode = DataGridViewSelectionMode.CellSelect;
-        }
 
-        private byte[] imageToByteArray(System.Drawing.Image imageIn)
-        {
-            MemoryStream ms = new MemoryStream();
-            imageIn.Save(ms, System.Drawing.Imaging.ImageFormat.Gif);
-            return ms.ToArray();
+            pnlNoChange.Visible = !hasChanges;
+            btnImport.Enabled = hasChanges;
         }
     }
 }

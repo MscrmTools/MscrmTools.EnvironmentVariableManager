@@ -32,7 +32,6 @@ namespace MscrmTools.EnvironmentVariableManager
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.toolStripMenu = new System.Windows.Forms.ToolStrip();
             this.tsbLoad = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
@@ -45,40 +44,9 @@ namespace MscrmTools.EnvironmentVariableManager
             this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.tsbExportExcel = new System.Windows.Forms.ToolStripButton();
             this.tsbImportFromExcel = new System.Windows.Forms.ToolStripButton();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.Column1 = new MscrmTools.EnvironmentVariableManager.AppCode.TextAndImageColumn();
-            this.SchemaName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Value = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Id1 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Id2 = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.TypeInt = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Type = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.gbEnvVariable = new System.Windows.Forms.GroupBox();
-            this.btnValidateEnv = new System.Windows.Forms.Button();
-            this.txtDefaultValue = new System.Windows.Forms.TextBox();
-            this.lblDefautValue = new System.Windows.Forms.Label();
-            this.cbbType = new System.Windows.Forms.ComboBox();
-            this.lblType = new System.Windows.Forms.Label();
-            this.txtDescription = new System.Windows.Forms.TextBox();
-            this.lblDescription = new System.Windows.Forms.Label();
-            this.txtUniqueName = new System.Windows.Forms.TextBox();
-            this.lblUniqueName = new System.Windows.Forms.Label();
-            this.txtDisplayName = new System.Windows.Forms.TextBox();
-            this.lblDisplayName = new System.Windows.Forms.Label();
-            this.scMain = new System.Windows.Forms.SplitContainer();
             this.excelImportDialog1 = new MscrmTools.EnvironmentVariableManager.UserControls.ExcelImportDialog();
-            this.cmsEnvs = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.tsmiCopySchemaName = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiCopyName = new System.Windows.Forms.ToolStripMenuItem();
-            this.tsmiCopyValue = new System.Windows.Forms.ToolStripMenuItem();
+            this.dpMain = new WeifenLuo.WinFormsUI.Docking.DockPanel();
             this.toolStripMenu.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
-            this.gbEnvVariable.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.scMain)).BeginInit();
-            this.scMain.Panel1.SuspendLayout();
-            this.scMain.Panel2.SuspendLayout();
-            this.scMain.SuspendLayout();
-            this.cmsEnvs.SuspendLayout();
             this.SuspendLayout();
             // 
             // toolStripMenu
@@ -124,7 +92,6 @@ namespace MscrmTools.EnvironmentVariableManager
             // tstxtSearch
             // 
             this.tstxtSearch.AutoToolTip = true;
-            this.tstxtSearch.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.tstxtSearch.Name = "tstxtSearch";
             this.tstxtSearch.Size = new System.Drawing.Size(256, 39);
             this.tstxtSearch.ToolTipText = "Search an environment variable";
@@ -186,252 +153,10 @@ namespace MscrmTools.EnvironmentVariableManager
             this.tsbImportFromExcel.Text = "Import";
             this.tsbImportFromExcel.Click += new System.EventHandler(this.tsbImportFromExcel_Click);
             // 
-            // dataGridView1
-            // 
-            this.dataGridView1.AllowUserToAddRows = false;
-            this.dataGridView1.AllowUserToDeleteRows = false;
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.Column1,
-            this.SchemaName,
-            this.Value,
-            this.Id1,
-            this.Id2,
-            this.TypeInt,
-            this.Type});
-            this.dataGridView1.ContextMenuStrip = this.cmsEnvs;
-            this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView1.Location = new System.Drawing.Point(0, 0);
-            this.dataGridView1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.RowHeadersWidth = 62;
-            this.dataGridView1.RowTemplate.Height = 28;
-            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(1032, 1055);
-            this.dataGridView1.TabIndex = 5;
-            this.dataGridView1.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_CellDoubleClick);
-            this.dataGridView1.RowEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView1_RowEnter);
-            // 
-            // Column1
-            // 
-            this.Column1.HeaderText = "Variable name";
-            this.Column1.Image = null;
-            this.Column1.MinimumWidth = 8;
-            this.Column1.Name = "Column1";
-            this.Column1.ReadOnly = true;
-            this.Column1.Width = 150;
-            // 
-            // SchemaName
-            // 
-            this.SchemaName.HeaderText = "Schema name";
-            this.SchemaName.MinimumWidth = 8;
-            this.SchemaName.Name = "SchemaName";
-            this.SchemaName.ReadOnly = true;
-            this.SchemaName.Width = 150;
-            // 
-            // Value
-            // 
-            this.Value.HeaderText = "Value";
-            this.Value.MinimumWidth = 8;
-            this.Value.Name = "Value";
-            this.Value.Width = 150;
-            // 
-            // Id1
-            // 
-            this.Id1.HeaderText = "Id1";
-            this.Id1.MinimumWidth = 8;
-            this.Id1.Name = "Id1";
-            this.Id1.Visible = false;
-            this.Id1.Width = 150;
-            // 
-            // Id2
-            // 
-            this.Id2.HeaderText = "Id2";
-            this.Id2.MinimumWidth = 8;
-            this.Id2.Name = "Id2";
-            this.Id2.Visible = false;
-            this.Id2.Width = 150;
-            // 
-            // TypeInt
-            // 
-            this.TypeInt.HeaderText = "TypeInt";
-            this.TypeInt.MinimumWidth = 8;
-            this.TypeInt.Name = "TypeInt";
-            this.TypeInt.Visible = false;
-            this.TypeInt.Width = 150;
-            // 
-            // Type
-            // 
-            this.Type.HeaderText = "Type";
-            this.Type.MinimumWidth = 8;
-            this.Type.Name = "Type";
-            this.Type.ReadOnly = true;
-            this.Type.Width = 150;
-            // 
-            // gbEnvVariable
-            // 
-            this.gbEnvVariable.Controls.Add(this.btnValidateEnv);
-            this.gbEnvVariable.Controls.Add(this.txtDefaultValue);
-            this.gbEnvVariable.Controls.Add(this.lblDefautValue);
-            this.gbEnvVariable.Controls.Add(this.cbbType);
-            this.gbEnvVariable.Controls.Add(this.lblType);
-            this.gbEnvVariable.Controls.Add(this.txtDescription);
-            this.gbEnvVariable.Controls.Add(this.lblDescription);
-            this.gbEnvVariable.Controls.Add(this.txtUniqueName);
-            this.gbEnvVariable.Controls.Add(this.lblUniqueName);
-            this.gbEnvVariable.Controls.Add(this.txtDisplayName);
-            this.gbEnvVariable.Controls.Add(this.lblDisplayName);
-            this.gbEnvVariable.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.gbEnvVariable.FlatStyle = System.Windows.Forms.FlatStyle.System;
-            this.gbEnvVariable.Location = new System.Drawing.Point(0, 0);
-            this.gbEnvVariable.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.gbEnvVariable.Name = "gbEnvVariable";
-            this.gbEnvVariable.Padding = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.gbEnvVariable.Size = new System.Drawing.Size(536, 1055);
-            this.gbEnvVariable.TabIndex = 6;
-            this.gbEnvVariable.TabStop = false;
-            this.gbEnvVariable.Text = "New environment variable ";
-            // 
-            // btnValidateEnv
-            // 
-            this.btnValidateEnv.Dock = System.Windows.Forms.DockStyle.Top;
-            this.btnValidateEnv.Location = new System.Drawing.Point(3, 391);
-            this.btnValidateEnv.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.btnValidateEnv.Name = "btnValidateEnv";
-            this.btnValidateEnv.Size = new System.Drawing.Size(530, 44);
-            this.btnValidateEnv.TabIndex = 10;
-            this.btnValidateEnv.Text = "Save";
-            this.btnValidateEnv.UseVisualStyleBackColor = true;
-            this.btnValidateEnv.Click += new System.EventHandler(this.btnValidateEnv_Click);
-            // 
-            // txtDefaultValue
-            // 
-            this.txtDefaultValue.Dock = System.Windows.Forms.DockStyle.Top;
-            this.txtDefaultValue.Location = new System.Drawing.Point(3, 309);
-            this.txtDefaultValue.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.txtDefaultValue.Multiline = true;
-            this.txtDefaultValue.Name = "txtDefaultValue";
-            this.txtDefaultValue.Size = new System.Drawing.Size(530, 82);
-            this.txtDefaultValue.TabIndex = 9;
-            // 
-            // lblDefautValue
-            // 
-            this.lblDefautValue.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblDefautValue.Location = new System.Drawing.Point(3, 281);
-            this.lblDefautValue.Name = "lblDefautValue";
-            this.lblDefautValue.Size = new System.Drawing.Size(530, 28);
-            this.lblDefautValue.TabIndex = 8;
-            this.lblDefautValue.Text = "Default value";
-            this.lblDefautValue.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-            // 
-            // cbbType
-            // 
-            this.cbbType.Dock = System.Windows.Forms.DockStyle.Top;
-            this.cbbType.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.cbbType.FormattingEnabled = true;
-            this.cbbType.Items.AddRange(new object[] {
-            "String",
-            "Number",
-            "Boolean",
-            "JSON",
-            "Connection reference",
-            "Secret"});
-            this.cbbType.Location = new System.Drawing.Point(3, 257);
-            this.cbbType.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.cbbType.Name = "cbbType";
-            this.cbbType.Size = new System.Drawing.Size(530, 24);
-            this.cbbType.TabIndex = 7;
-            // 
-            // lblType
-            // 
-            this.lblType.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblType.Location = new System.Drawing.Point(3, 227);
-            this.lblType.Name = "lblType";
-            this.lblType.Size = new System.Drawing.Size(530, 30);
-            this.lblType.TabIndex = 6;
-            this.lblType.Text = "Type";
-            this.lblType.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-            // 
-            // txtDescription
-            // 
-            this.txtDescription.Dock = System.Windows.Forms.DockStyle.Top;
-            this.txtDescription.Location = new System.Drawing.Point(3, 145);
-            this.txtDescription.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.txtDescription.Multiline = true;
-            this.txtDescription.Name = "txtDescription";
-            this.txtDescription.Size = new System.Drawing.Size(530, 82);
-            this.txtDescription.TabIndex = 5;
-            // 
-            // lblDescription
-            // 
-            this.lblDescription.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblDescription.Location = new System.Drawing.Point(3, 117);
-            this.lblDescription.Name = "lblDescription";
-            this.lblDescription.Size = new System.Drawing.Size(530, 28);
-            this.lblDescription.TabIndex = 4;
-            this.lblDescription.Text = "Description";
-            this.lblDescription.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-            // 
-            // txtUniqueName
-            // 
-            this.txtUniqueName.Dock = System.Windows.Forms.DockStyle.Top;
-            this.txtUniqueName.Location = new System.Drawing.Point(3, 95);
-            this.txtUniqueName.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.txtUniqueName.Name = "txtUniqueName";
-            this.txtUniqueName.Size = new System.Drawing.Size(530, 22);
-            this.txtUniqueName.TabIndex = 3;
-            // 
-            // lblUniqueName
-            // 
-            this.lblUniqueName.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblUniqueName.Location = new System.Drawing.Point(3, 67);
-            this.lblUniqueName.Name = "lblUniqueName";
-            this.lblUniqueName.Size = new System.Drawing.Size(530, 28);
-            this.lblUniqueName.TabIndex = 2;
-            this.lblUniqueName.Text = "Unique name";
-            this.lblUniqueName.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-            // 
-            // txtDisplayName
-            // 
-            this.txtDisplayName.Dock = System.Windows.Forms.DockStyle.Top;
-            this.txtDisplayName.Location = new System.Drawing.Point(3, 45);
-            this.txtDisplayName.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.txtDisplayName.Name = "txtDisplayName";
-            this.txtDisplayName.Size = new System.Drawing.Size(530, 22);
-            this.txtDisplayName.TabIndex = 1;
-            // 
-            // lblDisplayName
-            // 
-            this.lblDisplayName.Dock = System.Windows.Forms.DockStyle.Top;
-            this.lblDisplayName.Location = new System.Drawing.Point(3, 17);
-            this.lblDisplayName.Name = "lblDisplayName";
-            this.lblDisplayName.Size = new System.Drawing.Size(530, 28);
-            this.lblDisplayName.TabIndex = 0;
-            this.lblDisplayName.Text = "Display name";
-            this.lblDisplayName.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-            // 
-            // scMain
-            // 
-            this.scMain.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.scMain.Location = new System.Drawing.Point(0, 39);
-            this.scMain.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.scMain.Name = "scMain";
-            // 
-            // scMain.Panel1
-            // 
-            this.scMain.Panel1.Controls.Add(this.dataGridView1);
-            // 
-            // scMain.Panel2
-            // 
-            this.scMain.Panel2.Controls.Add(this.gbEnvVariable);
-            this.scMain.Size = new System.Drawing.Size(1572, 1055);
-            this.scMain.SplitterDistance = 1032;
-            this.scMain.TabIndex = 7;
-            // 
             // excelImportDialog1
             // 
             this.excelImportDialog1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.excelImportDialog1.Location = new System.Drawing.Point(-6, 56);
+            this.excelImportDialog1.Location = new System.Drawing.Point(188, 273);
             this.excelImportDialog1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.excelImportDialog1.Name = "excelImportDialog1";
             this.excelImportDialog1.Size = new System.Drawing.Size(1257, 57);
@@ -439,56 +164,28 @@ namespace MscrmTools.EnvironmentVariableManager
             this.excelImportDialog1.Variables = null;
             this.excelImportDialog1.Visible = false;
             // 
-            // cmsEnvs
+            // dpMain
             // 
-            this.cmsEnvs.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.cmsEnvs.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tsmiCopyName,
-            this.tsmiCopySchemaName,
-            this.tsmiCopyValue});
-            this.cmsEnvs.Name = "cmsEnvs";
-            this.cmsEnvs.Size = new System.Drawing.Size(213, 104);
-            this.cmsEnvs.ItemClicked += new System.Windows.Forms.ToolStripItemClickedEventHandler(this.cmsEnvs_ItemClicked);
-            // 
-            // tsmiCopySchemaName
-            // 
-            this.tsmiCopySchemaName.Name = "tsmiCopySchemaName";
-            this.tsmiCopySchemaName.Size = new System.Drawing.Size(212, 24);
-            this.tsmiCopySchemaName.Text = "Copy Schema Name";
-            // 
-            // tsmiCopyName
-            // 
-            this.tsmiCopyName.Name = "tsmiCopyName";
-            this.tsmiCopyName.Size = new System.Drawing.Size(212, 24);
-            this.tsmiCopyName.Text = "Copy name";
-            // 
-            // tsmiCopyValue
-            // 
-            this.tsmiCopyValue.Name = "tsmiCopyValue";
-            this.tsmiCopyValue.Size = new System.Drawing.Size(212, 24);
-            this.tsmiCopyValue.Text = "Copy value";
+            this.dpMain.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dpMain.DocumentStyle = WeifenLuo.WinFormsUI.Docking.DocumentStyle.DockingWindow;
+            this.dpMain.Location = new System.Drawing.Point(0, 39);
+            this.dpMain.Name = "dpMain";
+            this.dpMain.Size = new System.Drawing.Size(1572, 1055);
+            this.dpMain.TabIndex = 9;
             // 
             // EvmControl
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.dpMain);
             this.Controls.Add(this.excelImportDialog1);
-            this.Controls.Add(this.scMain);
             this.Controls.Add(this.toolStripMenu);
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "EvmControl";
             this.Size = new System.Drawing.Size(1572, 1094);
             this.Resize += new System.EventHandler(this.EvmControl_Resize);
             this.toolStripMenu.ResumeLayout(false);
             this.toolStripMenu.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
-            this.gbEnvVariable.ResumeLayout(false);
-            this.gbEnvVariable.PerformLayout();
-            this.scMain.Panel1.ResumeLayout(false);
-            this.scMain.Panel2.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.scMain)).EndInit();
-            this.scMain.ResumeLayout(false);
-            this.cmsEnvs.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -497,24 +194,10 @@ namespace MscrmTools.EnvironmentVariableManager
         #endregion
         private System.Windows.Forms.ToolStrip toolStripMenu;
         private System.Windows.Forms.ToolStripButton tsbLoad;
-        private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.ToolStripButton tsbUpdate;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-        private System.Windows.Forms.GroupBox gbEnvVariable;
-        private System.Windows.Forms.ComboBox cbbType;
-        private System.Windows.Forms.Label lblType;
-        private System.Windows.Forms.TextBox txtDescription;
-        private System.Windows.Forms.Label lblDescription;
-        private System.Windows.Forms.TextBox txtUniqueName;
-        private System.Windows.Forms.Label lblUniqueName;
-        private System.Windows.Forms.TextBox txtDisplayName;
-        private System.Windows.Forms.Label lblDisplayName;
-        private System.Windows.Forms.TextBox txtDefaultValue;
-        private System.Windows.Forms.Label lblDefautValue;
-        private System.Windows.Forms.Button btnValidateEnv;
         private System.Windows.Forms.ToolStripButton tsbCreateNewVarEnvDef;
         private System.Windows.Forms.ToolStripButton tsbDelete;
-        private System.Windows.Forms.SplitContainer scMain;
         private System.Windows.Forms.ToolStripLabel tslSearch;
         private System.Windows.Forms.ToolStripTextBox tstxtSearch;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
@@ -522,16 +205,6 @@ namespace MscrmTools.EnvironmentVariableManager
         private System.Windows.Forms.ToolStripButton tsbExportExcel;
         private System.Windows.Forms.ToolStripButton tsbImportFromExcel;
         private UserControls.ExcelImportDialog excelImportDialog1;
-        private AppCode.TextAndImageColumn Column1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn SchemaName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Value;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Id1;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Id2;
-        private System.Windows.Forms.DataGridViewTextBoxColumn TypeInt;
-        private System.Windows.Forms.DataGridViewTextBoxColumn Type;
-        private System.Windows.Forms.ContextMenuStrip cmsEnvs;
-        private System.Windows.Forms.ToolStripMenuItem tsmiCopyName;
-        private System.Windows.Forms.ToolStripMenuItem tsmiCopySchemaName;
-        private System.Windows.Forms.ToolStripMenuItem tsmiCopyValue;
+        private WeifenLuo.WinFormsUI.Docking.DockPanel dpMain;
     }
 }
