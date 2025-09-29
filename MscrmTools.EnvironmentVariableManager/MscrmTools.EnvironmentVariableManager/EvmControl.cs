@@ -414,6 +414,8 @@ namespace MscrmTools.EnvironmentVariableManager
                 list.Add(new Tuple<Guid, Guid, string, string, int>(id, defId, variable, value, row.Index));
             }
 
+            evf.ClearSelected();
+
             WorkAsync(new WorkAsyncInfo
             {
                 Work = (bw, evt) =>
@@ -457,6 +459,8 @@ namespace MscrmTools.EnvironmentVariableManager
                                 {
                                     evf.SetNewId(item.Item5, id);
                                 }
+
+                                evf.SetSuccess(item.Item5);
                             }));
                         }
                         catch (Exception error)

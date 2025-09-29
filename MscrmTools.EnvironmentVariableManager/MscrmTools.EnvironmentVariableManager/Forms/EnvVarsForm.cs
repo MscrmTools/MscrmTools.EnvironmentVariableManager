@@ -189,15 +189,32 @@ The solution involved are the following:
             }
         }
 
+        public void SetSuccess(int index)
+        {
+            foreach (DataGridViewCell cell in dataGridView1.Rows[index].Cells)
+            {
+                cell.Style.BackColor = Color.LightGreen;
+            }
+
+            _rowsIndexChanged.Remove(index);
+        }
+
+        internal void ClearSelected()
+        {
+            dataGridView1.ClearSelection();
+        }
+
         internal void ClearSuccess()
         {
             foreach (DataGridViewRow row in dataGridView1.Rows)
-
+            {
                 foreach (DataGridViewCell cell in row.Cells)
                 {
                     if (cell.Style.BackColor == Color.LightGreen)
                         cell.Style.BackColor = Color.White;
                 }
+
+            }
         }
 
         private void cmsEnvs_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
@@ -281,6 +298,8 @@ Please correct the value: yes or no", @"Error",
             {
                 cell.Style.BackColor = Color.Yellow;
             }
+
+            dataGridView1.ClearSelection();
         }
 
         private void dataGridView1_RowEnter(object sender, DataGridViewCellEventArgs e)
