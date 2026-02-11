@@ -409,7 +409,7 @@ namespace MscrmTools.EnvironmentVariableManager
                 var variable = row.Cells[0].Value.ToString();
                 var id = new Guid(row.Cells[3].Value?.ToString() ?? Guid.Empty.ToString());
                 var defId = new Guid(row.Cells[4].Value?.ToString() ?? Guid.Empty.ToString());
-                var value = row.Cells[2].Value.ToString();
+                var value = row.Cells[2].Value?.ToString();
 
                 list.Add(new Tuple<Guid, Guid, string, string, int>(id, defId, variable, value, row.Index));
             }

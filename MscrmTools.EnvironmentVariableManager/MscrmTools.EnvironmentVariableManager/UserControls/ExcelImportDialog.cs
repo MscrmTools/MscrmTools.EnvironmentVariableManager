@@ -60,7 +60,7 @@ namespace MscrmTools.EnvironmentVariableManager.UserControls
                                      new KeyValuePair<string, object>("displayname", row.Cells[0].Value.ToString()),
                                      new KeyValuePair<string, object>("description", row.Cells[5].Value?.ToString() ?? ""),
                                      new KeyValuePair<string, object>("type", row.Cells[4].Value.ToString()),
-                                     new KeyValuePair<string, object>("value", row.Cells[3].Value.ToString()),
+                                     new KeyValuePair<string, object>("value", row.Cells[3].Value?.ToString()),
                                      new KeyValuePair<string, object>("solutionuniquename", ((AppCode.SolutionInfo)cbbSolutions.SelectedItem)?.UniqueName)
                                  }
                              }).ToList()
