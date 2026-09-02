@@ -163,7 +163,22 @@ namespace MscrmTools.EnvironmentVariableManager
                                         new ConditionExpression("environmentvariabledefinitionid", ConditionOperator.Equal, variable.Id)
                                     }
                                 }
-                            }).Entities.First();
+                            }).Entities.FirstOrDefault();
+
+                            if(varToUpdate == null)
+                            {
+                                varToUpdate = new Entity("environmentvariablevalue")
+                                {
+                                    Attributes =
+                                    {
+                                        {"environmentvariabledefinitionid",variable.ToEntityReference()},
+                                        {"value",variable.GetAttributeValue<string>("value")},
+                                    }
+                                };
+
+                                Service.Create(varToUpdate);
+                                continue;
+                            }
 
                             varToUpdate["value"] = variable.GetAttributeValue<string>("value");
 
