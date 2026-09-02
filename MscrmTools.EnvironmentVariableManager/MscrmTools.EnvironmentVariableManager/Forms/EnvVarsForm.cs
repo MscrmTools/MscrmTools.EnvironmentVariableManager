@@ -27,6 +27,7 @@ namespace MscrmTools.EnvironmentVariableManager.Forms
 
         public List<DataGridViewRow> ChangedRows => dataGridView1.Rows.Cast<DataGridViewRow>().Where(r => _rowsIndexChanged.Contains(r.Index)).ToList();
         public DataGridViewRow SelectedRow => dataGridView1.SelectedRows.Count < 1 ? null : dataGridView1.SelectedRows[0];
+        public string filterText { get; set; }
         public IOrganizationService Service { get; set; }
 
         public void DisplayRows(object filter = null)
@@ -120,6 +121,8 @@ The solution involved are the following:
 
             SetDatagridViewColumnsSettings();
             dataGridView1.CellValueChanged += DataGridView1_CellValueChanged;
+
+            DisplayRows(filterText);
         }
 
         public void LoadVariables()

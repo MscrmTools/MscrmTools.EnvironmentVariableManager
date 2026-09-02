@@ -165,7 +165,7 @@ namespace MscrmTools.EnvironmentVariableManager
                                 }
                             }).Entities.FirstOrDefault();
 
-                            if(varToUpdate == null)
+                            if (varToUpdate == null)
                             {
                                 varToUpdate = new Entity("environmentvariablevalue")
                                 {
@@ -304,6 +304,7 @@ namespace MscrmTools.EnvironmentVariableManager
         {
             if (e.ClickedItem == tsbLoad)
             {
+                evf.filterText = tstxtSearch.Text;
                 ExecuteMethod(LoadVariables);
                 LoadSolutions();
             }
